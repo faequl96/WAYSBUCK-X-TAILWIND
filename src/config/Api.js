@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const API = axios.create({
-   baseURL: "https://waysbucks.osc-fr1.scalingo.io/api/v1",
+   baseURL: process.env.REACT_APP_BASEURL,
 });
 
 export const setAuthToken = (token) => {
