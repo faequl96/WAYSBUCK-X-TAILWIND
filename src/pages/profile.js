@@ -12,6 +12,7 @@ import checkEditGray from "../assets/checkEditGray.png";
 import checkEditRed from "../assets/checkEditRed.png";
 import barcodIcon from "../assets/barcod.png";
 import logo from "../assets/logo.png";
+import Arrow from "../components/icon/arrow";
 
 const Profile = () => {
   const contexts = useContext(AppContext);
@@ -289,26 +290,26 @@ const Profile = () => {
           >
             {({ open }) => (
               <>
-                <div className="h-14 fixed inset-x-0 bottom-0 grid grid-cols-[auto,140px] items-center px-3 lg:hidden border-t-2 bg-white">
-                  <div className="py-2">
-                    <div className="flex items-center">
-                      <div className="flex justify-between w-full">
-                        <span className="text-red-900 text-lg font-black">
-                          Total
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                <div className="h-14 fixed inset-x-0 bottom-0 flex justify-between items-center pl-3 pr-1 lg:hidden border-t-2 bg-white">
                   {open ? (
-                    <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 bg-red-600 text-white focus:outline-none">
-                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                    <div></div>
+                  ) : (
+                    <span className="text-slate-700 text-xl font-semibold">
+                      My Transactions
+                    </span>
+                  )}
+                  {open ? (
+                    <Disclosure.Button className="flex justify-center items-center pt-1">
+                      <div className="w-12 h-12 scale-110">
+                        <Arrow fill="text-red-600" />
+                      </div>
                     </Disclosure.Button>
                   ) : (
-                    <div className="text-end">
-                      <Disclosure.Button className="py-2 w-32 lg:text-xl lg:w-full rounded-md bg-red-600 hover:bg-red-500 font-bold text-white focus:outline-none">
-                        Pay
-                      </Disclosure.Button>
-                    </div>
+                    <Disclosure.Button className="flex justify-center items-center">
+                      <div className="w-12 h-12 scale-110 rotate-180">
+                        <Arrow fill="text-red-600" />
+                      </div>
+                    </Disclosure.Button>
                   )}
                 </div>
 
