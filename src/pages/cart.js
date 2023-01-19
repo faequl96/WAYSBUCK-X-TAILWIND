@@ -70,16 +70,16 @@ const Cart = () => {
 
       window.snap.pay(token, {
         onSuccess: function (result) {
-          navigate("/customer/myprofile");
+          navigate("/customer/profile");
         },
         onPending: function (result) {
-          navigate("/customer/myprofile");
+          navigate("/customer/profile");
         },
         onError: function (result) {
           console.log(result);
         },
         onClose: function () {
-          alert("you closed the popup without finishing the payment");
+          alert("You closed the popup without finishing the payment");
         },
       });
 
