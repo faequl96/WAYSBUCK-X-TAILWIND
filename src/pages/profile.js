@@ -13,6 +13,7 @@ import checkEditRed from "../assets/checkEditRed.png";
 import barcodIcon from "../assets/barcod.png";
 import logo from "../assets/logo.png";
 import Arrow from "../components/icon/arrow";
+import Spinner from "../components/feedback/spinner2";
 
 const Profile = () => {
   const contexts = useContext(AppContext);
@@ -23,6 +24,7 @@ const Profile = () => {
   const [isEditName, setIsEditName] = useState(false);
   const [isEditEmail, setIsEditEmail] = useState(false);
   const [preview, setPreview] = useState();
+  const [isLoading, setIsLoading] = useState(false);
   const [editData, setEditData] = useState({
     name: "",
     email: "",
@@ -81,6 +83,8 @@ const Profile = () => {
     try {
       e.preventDefault();
 
+      setIsLoading(true);
+
       const formData = new FormData();
       formData.set("name", editData.name);
       formData.set("email", editData.email);
@@ -93,6 +97,7 @@ const Profile = () => {
       const result = await API.get("/check-auth");
       setProfile(result.data.data);
 
+      setIsLoading(false);
       contexts.refreshNavbar();
       setIsEditPhoto(false);
       setIsEditName(false);
@@ -120,11 +125,8 @@ const Profile = () => {
             <div className="md:grid grid-cols-[360px,auto] lg:grid-cols-[200px,auto]">
               <div className="w-100 h-48 md:h-auto flex justify-center relative">
                 <div className="aspect-[1/1] h-full relative">
-                  <div>
-                    <img
-                      src={preview}
-                      className="w-full overflow-hidden rounded-full"
-                    />
+                  <div className="aspect-[1/1] rounded-full overflow-hidden flex items-center bg-slate-400">
+                    <img src={preview} className="w-full" />
                   </div>
                   {isEditPhoto && (
                     <>
@@ -151,21 +153,32 @@ const Profile = () => {
                     className="h-[32px] w-[32px] lg:h-[30px] lg:w-[30px] absolute right-0 bottom-0 lg:-right-1 lg:-bottom-1 cursor-pointer group"
                     onClick={(e) => handleSubmit.mutate(e)}
                   >
-                    <img src={checkEditGray} className="group-hover:hidden" />
-                    <img
-                      src={checkEditRed}
-                      className="hidden group-hover:block"
-                    />
+                    {isLoading ? (
+                      <div className="w-full h-full">
+                        <Spinner fill="text-neutral-400" />
+                      </div>
+                    ) : (
+                      <>
+                        <img
+                          src={checkEditGray}
+                          className="lg:group-hover:hidden"
+                        />
+                        <img
+                          src={checkEditRed}
+                          className="hidden lg:group-hover:block"
+                        />
+                      </>
+                    )}
                   </div>
                 ) : (
                   <div
                     className="h-[32px] w-[32px] lg:h-[30px] lg:w-[30px] absolute right-0 bottom-0 lg:-right-1 lg:-bottom-1 cursor-pointer group"
                     onClick={() => setIsEditPhoto(true)}
                   >
-                    <img src={editIconGray} className="group-hover:hidden" />
+                    <img src={editIconGray} className="lg:group-hover:hidden" />
                     <img
                       src={editIconRed}
-                      className="hidden group-hover:block"
+                      className="hidden lg:group-hover:block"
                     />
                   </div>
                 )}
@@ -200,14 +213,22 @@ const Profile = () => {
                           className="flex items-center group cursor-pointer"
                           onClick={(e) => handleSubmit.mutate(e)}
                         >
-                          <img
-                            src={checkEditGray}
-                            className="group-hover:hidden"
-                          />
-                          <img
-                            src={checkEditRed}
-                            className="hidden group-hover:block"
-                          />
+                          {isLoading ? (
+                            <div className="w-full h-full">
+                              <Spinner fill="text-neutral-400" />
+                            </div>
+                          ) : (
+                            <>
+                              <img
+                                src={checkEditGray}
+                                className="lg:group-hover:hidden"
+                              />
+                              <img
+                                src={checkEditRed}
+                                className="hidden lg:group-hover:block"
+                              />
+                            </>
+                          )}
                         </div>
                       ) : (
                         <div
@@ -216,11 +237,11 @@ const Profile = () => {
                         >
                           <img
                             src={editIconGray}
-                            className="group-hover:hidden"
+                            className="lg:group-hover:hidden"
                           />
                           <img
                             src={editIconRed}
-                            className="hidden group-hover:block"
+                            className="hidden lg:group-hover:block"
                           />
                         </div>
                       )}
@@ -253,14 +274,22 @@ const Profile = () => {
                           className="flex items-center group cursor-pointer"
                           onClick={(e) => handleSubmit.mutate(e)}
                         >
-                          <img
-                            src={checkEditGray}
-                            className="group-hover:hidden"
-                          />
-                          <img
-                            src={checkEditRed}
-                            className="hidden group-hover:block"
-                          />
+                          {isLoading ? (
+                            <div className="w-full h-full">
+                              <Spinner fill="text-neutral-400" />
+                            </div>
+                          ) : (
+                            <>
+                              <img
+                                src={checkEditGray}
+                                className="lg:group-hover:hidden"
+                              />
+                              <img
+                                src={checkEditRed}
+                                className="hidden lg:group-hover:block"
+                              />
+                            </>
+                          )}
                         </div>
                       ) : (
                         <div
@@ -269,11 +298,11 @@ const Profile = () => {
                         >
                           <img
                             src={editIconGray}
-                            className="group-hover:hidden"
+                            className="lg:group-hover:hidden"
                           />
                           <img
                             src={editIconRed}
-                            className="hidden group-hover:block"
+                            className="hidden lg:group-hover:block"
                           />
                         </div>
                       )}
@@ -315,7 +344,7 @@ const Profile = () => {
 
                 <Disclosure.Panel className="lg:hidden h-[100vh]">
                   <div className="">
-                    <div className="px-3 pt-24 pb-2 bg-white">
+                    <div className="px-3 pt-24 pb-2 bg-white border-b-2">
                       <h2 className="text-3xl font-extrabold text-red-600 mb-2">
                         My Transactions
                       </h2>

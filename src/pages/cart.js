@@ -6,13 +6,18 @@ import trashIcon from "../assets/trash.png";
 import { useNavigate } from "react-router-dom";
 import { API } from "../config/Api";
 import { useMutation, useQuery } from "react-query";
+import Arrow from "../components/icon/arrow";
+import Spinner from "../components/feedback/spinner2";
 
 const Cart = () => {
   const contexts = useContext(AppContext);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   let { data: cart, refetch } = useQuery("cartsCache", async () => {
     const response = await API.get("/cart");
+
+    setIsLoading(false);
 
     if (response.data.data === 0) {
       contexts.setCartLength(0);
@@ -28,6 +33,7 @@ const Cart = () => {
   let totalPrice = price?.reduce((a, b) => a + b, 0);
 
   const handlerDeleteCart = async (id) => {
+    setIsLoading(true);
     await API.delete(`/cart/${id}`);
     refetch();
   };
@@ -106,8 +112,14 @@ const Cart = () => {
       if (hour < 10) {
         hour = `0${hour}`;
       }
-      const date = new Date().getDate();
-      const month = new Date().getMonth();
+      let date = new Date().getDate();
+      if (date < 10) {
+        date = `0${date}`;
+      }
+      let month = new Date().getMonth() + 1;
+      if (month < 10) {
+        month = `0${month}`;
+      }
       const year = new Date().getFullYear();
       const time = `${date}-${month}-${year} at ${hour}:${minute}:${second}`;
 
@@ -163,7 +175,11 @@ const Cart = () => {
         </div>
         <div className="lg:flex justify-between mt-52 md:mt-28 lg:mt-0 mb-44 lg:mb-4">
           <div className="px-3 lg:w-[60%]">
-            <div className={`lg:border-t-[1px] lg:border-b-[1px] border-slate-800 mb-4 lg:mb-8 lg:pr-4 lg:overflow-y-scroll min-h-[50vh] lg:h-[40vh] ${cart?.length == undefined ? "flex items-center" : ""}`}>
+            <div
+              className={`lg:border-t-[1px] lg:border-b-[1px] border-slate-800 mb-4 lg:mb-8 lg:pr-4 lg:overflow-y-scroll min-h-[50vh] lg:h-[40vh] ${
+                cart?.length == undefined ? "flex items-center" : ""
+              }`}
+            >
               {cart?.length == undefined ? (
                 <div className="h-[100%] lg:h-full w-full flex justify-center items-center">
                   <h3 className="font-bold text-xl text-slate-500">
@@ -185,7 +201,7 @@ const Cart = () => {
                       </div>
                       <div className="pl-3 flex flex-col justify-between">
                         <div className="md:pr-10 lg:pr-0">
-                          <h5 className="text-lg font-bold text-red-600">
+                          <h5 className="text-lg font-bold text-red-600 leading-4 mb-1">
                             {item.product.title}
                           </h5>
                           <div
@@ -196,23 +212,29 @@ const Cart = () => {
                               Toppings :
                             </h6>
                             <div className="leading-3">
-                              {item.toppings?.map((topping, index) => (
-                                <span key={topping.id} className="text-sm">
-                                  {item.toppings?.length === index + 1 ? (
-                                    <>{topping.title}</>
-                                  ) : (
-                                    <>{topping.title}, </>
-                                  )}
-                                </span>
-                              ))}
+                              {item.toppings.length === 0 ? (
+                                <span className="text-sm">-</span>
+                              ) : (
+                                <>
+                                  {item.toppings?.map((topping, index) => (
+                                    <span key={topping.id} className="text-sm">
+                                      {item.toppings?.length === index + 1 ? (
+                                        <>{topping.title}</>
+                                      ) : (
+                                        <>{topping.title}, </>
+                                      )}
+                                    </span>
+                                  ))}
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>
-                        <div className="flex justify-between items-center pt-2 md:hidden">
-                          <h6 className="text-red-600 font-semibold">
+                        <div className="flex justify-between items-end md:hidden h-6">
+                          <h6 className="text-red-600 font-semibold leading-4">
                             {contexts.formatRupiah(item.price)}
                           </h6>
-                          <Menu as="div">
+                          <Menu as="div" className="h-6">
                             <Menu.Button className="w-5 cursor-pointer group">
                               <img
                                 className="group-hover:brightness-200"
@@ -238,10 +260,16 @@ const Cart = () => {
                                       No
                                     </Menu.Button>
                                     <button
-                                      className="bg-slate-500 w-24 py-1 font-bold text-white rounded-md hover:bg-slate-400"
+                                      className="flex justify-center items-center bg-slate-500 w-24 py-1 font-bold text-white rounded-md hover:bg-slate-400"
                                       onClick={() => handlerDeleteCart(item.id)}
                                     >
-                                      Yes
+                                      {isLoading ? (
+                                        <div className="w-5 h-5">
+                                          <Spinner fill="text-white" />
+                                        </div>
+                                      ) : (
+                                        <span>Yes</span>
+                                      )}
                                     </button>
                                   </div>
                                 </div>
@@ -283,7 +311,13 @@ const Cart = () => {
                                     className="bg-slate-500 w-24 py-1 font-bold text-white rounded-md hover:bg-slate-400"
                                     onClick={() => handlerDeleteCart(item.id)}
                                   >
-                                    Yes
+                                    {isLoading ? (
+                                      <div className="w-5 h-5">
+                                        <Spinner fill="text-white" />
+                                      </div>
+                                    ) : (
+                                      <span>Yes</span>
+                                    )}
                                   </button>
                                 </div>
                               </div>
@@ -337,37 +371,40 @@ const Cart = () => {
                 {open ? (
                   <></>
                 ) : (
-                  <div className="px-3 bg-white pb-3 lg:hidden">
-                    <div className="border-t-[1px] border-b-[1px] border-slate-800 py-3">
-                      <div className="flex justify-between mb-3">
-                        <span className="text-red-600 font-semibold">
-                          Subtotal
-                        </span>
-                        <span className="text-red-600 font-semibold">
-                          {contexts.cartLength === 0
-                            ? contexts.formatRupiah(0)
-                            : contexts.formatRupiah(totalPrice)}
+                  <div className="px-3 bg-white lg:hidden">
+                    <div className="border-t-[1px] border-slate-800 py-3">
+                      <div className="flex justify-between mb-3 text-red-600 font-semibold">
+                        <span>Qty</span>
+                        <span>
+                          {contexts.cartLength === 0 ? (
+                            <span>-</span>
+                          ) : (
+                            <span>{cart?.length}</span>
+                          )}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-red-600 font-semibold">Qty</span>
-                        <span className="text-red-600 font-semibold">
-                          {contexts.cartLength === 0 ? (
-                            <span className="text-red-600 font-semibold">
-                              -
-                            </span>
-                          ) : (
-                            <span className="text-red-600 font-semibold">
-                              {cart?.length}
-                            </span>
-                          )}
+                        <span className="text-red-600 text-lg font-bold">
+                          Total
+                        </span>
+                        <span className="text-red-600 text-lg font-bold">
+                          {contexts.cartLength === 0
+                            ? contexts.formatRupiah(0)
+                            : contexts.formatRupiah(totalPrice)}
                         </span>
                       </div>
                     </div>
                   </div>
                 )}
                 {open ? (
-                  <div className="h-14 flex justify-end items-center px-3 lg:hidden border-t-2">
+                  <div className="h-14 flex justify-between items-center px-3 lg:hidden border-t-2">
+                    <div className="py-2">
+                      <div className="flex items-center">
+                        <h3 className="text-xl font-bold text-red-600">
+                          Shipping Info & Pay
+                        </h3>
+                      </div>
+                    </div>
                     {open ? (
                       <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 bg-red-600 text-white focus:outline-none">
                         <XMarkIcon
@@ -380,29 +417,22 @@ const Cart = () => {
                     )}
                   </div>
                 ) : (
-                  <div className="h-14 grid grid-cols-[auto,140px] items-center px-3 lg:hidden border-t-2 bg-white">
+                  <div className="h-14 grid grid-cols-[auto,140px] items-center pl-3 pr-1 lg:hidden border-t-2 bg-white">
                     <div className="py-2">
                       <div className="flex items-center">
-                        <div className="flex justify-between w-full">
-                          <span className="text-red-900 text-lg font-black">
-                            Total
-                          </span>
-                          <span className="text-red-900 text-lg font-black">
-                            {contexts.cartLength === 0
-                              ? contexts.formatRupiah(0)
-                              : contexts.formatRupiah(totalPrice)}
-                          </span>
-                        </div>
+                        <h5 className="text-lg font-semibold text-gray-600">
+                          Shipping Info & Pay
+                        </h5>
                       </div>
                     </div>
                     {open ? (
                       <></>
                     ) : (
-                      <div className="text-end">
-                        <Disclosure.Button className="py-2 w-32 lg:text-xl lg:w-full rounded-md bg-red-600 hover:bg-red-500 font-bold text-white focus:outline-none">
-                          Pay
-                        </Disclosure.Button>
-                      </div>
+                      <Disclosure.Button className="flex justify-end items-center">
+                        <div className="w-12 h-12 scale-110 rotate-180">
+                          <Arrow fill="text-red-600" />
+                        </div>
+                      </Disclosure.Button>
                     )}
                   </div>
                 )}
@@ -469,10 +499,10 @@ const Cart = () => {
                       <div className="py-2">
                         <div className="flex items-center">
                           <div className="flex justify-between w-full">
-                            <span className="text-red-600 text-lg font-black">
+                            <span className="text-red-600 text-lg font-bold">
                               Total
                             </span>
-                            <span className="text-red-600 text-lg font-black">
+                            <span className="text-red-700 text-lg font-bold">
                               {contexts.cartLength === 0
                                 ? contexts.formatRupiah(0)
                                 : contexts.formatRupiah(totalPrice)}
@@ -485,7 +515,7 @@ const Cart = () => {
                           className="py-2 w-32 lg:text-xl lg:w-full rounded-md bg-red-600 hover:bg-red-500 font-bold text-white focus:outline-none"
                           onClick={(e) => handlerTransaction.mutate(e)}
                         >
-                          Confirm
+                          Pay
                         </button>
                       </div>
                     </div>

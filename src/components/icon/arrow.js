@@ -14,10 +14,10 @@ const Arrow = ({ fill }) => {
       <path
         fill="none"
         stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-miterlimit="10"
-        stroke-width="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeMiterlimit="10"
+        strokeWidth="3"
         d="m20.5 11.5-6 6-6-6"
       />
     </svg>
