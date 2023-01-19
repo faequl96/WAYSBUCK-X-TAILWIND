@@ -82,7 +82,7 @@ export default function Navbars() {
                   {/* Profile dropdown */}
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <Menu.Button className="flex h-11 w-11 lg:h-14 lg:w-14 overflow-hidden rounded-full text-sm border-rose-700 border-[2px]">
+                      <Menu.Button className="flex items-center h-11 w-11 lg:h-14 lg:w-14 overflow-hidden rounded-full text-sm border-rose-700 border-[2px]">
                         <span className="sr-only">Open user menu</span>
                         <img
                           className="w-full"

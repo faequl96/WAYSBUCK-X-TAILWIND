@@ -149,16 +149,18 @@ const Profile = () => {
                   )}
                 </div>
                 {isEditPhoto ? (
-                  <div
-                    className="h-[32px] w-[32px] lg:h-[30px] lg:w-[30px] absolute right-0 bottom-0 lg:-right-1 lg:-bottom-1 cursor-pointer group"
-                    onClick={(e) => handleSubmit.mutate(e)}
-                  >
+                  <>
                     {isLoading ? (
-                      <div className="w-full h-full">
-                        <Spinner fill="text-neutral-400" />
+                      <div className="h-[32px] w-[32px] lg:h-[30px] lg:w-[30px] absolute right-0 bottom-0 lg:-right-1 lg:-bottom-1">
+                        <div className="w-full h-full">
+                          <Spinner fill="text-neutral-400" />
+                        </div>
                       </div>
                     ) : (
-                      <>
+                      <div
+                        className="h-[32px] w-[32px] lg:h-[30px] lg:w-[30px] absolute right-0 bottom-0 lg:-right-1 lg:-bottom-1 cursor-pointer group"
+                        onClick={(e) => handleSubmit.mutate(e)}
+                      >
                         <img
                           src={checkEditGray}
                           className="lg:group-hover:hidden"
@@ -167,9 +169,9 @@ const Profile = () => {
                           src={checkEditRed}
                           className="hidden lg:group-hover:block"
                         />
-                      </>
+                      </div>
                     )}
-                  </div>
+                  </>
                 ) : (
                   <div
                     className="h-[32px] w-[32px] lg:h-[30px] lg:w-[30px] absolute right-0 bottom-0 lg:-right-1 lg:-bottom-1 cursor-pointer group"
@@ -209,16 +211,18 @@ const Profile = () => {
                         )}
                       </div>
                       {isEditName ? (
-                        <div
-                          className="flex items-center group cursor-pointer"
-                          onClick={(e) => handleSubmit.mutate(e)}
-                        >
+                        <>
                           {isLoading ? (
-                            <div className="w-full h-full">
-                              <Spinner fill="text-neutral-400" />
+                            <div className="flex items-center">
+                              <div className="w-full h-full">
+                                <Spinner fill="text-neutral-400" />
+                              </div>
                             </div>
                           ) : (
-                            <>
+                            <div
+                              className="flex items-center group cursor-pointer"
+                              onClick={(e) => handleSubmit.mutate(e)}
+                            >
                               <img
                                 src={checkEditGray}
                                 className="lg:group-hover:hidden"
@@ -227,9 +231,9 @@ const Profile = () => {
                                 src={checkEditRed}
                                 className="hidden lg:group-hover:block"
                               />
-                            </>
+                            </div>
                           )}
-                        </div>
+                        </>
                       ) : (
                         <div
                           className="flex items-center group cursor-pointer"
@@ -270,16 +274,18 @@ const Profile = () => {
                         )}
                       </div>
                       {isEditEmail ? (
-                        <div
-                          className="flex items-center group cursor-pointer"
-                          onClick={(e) => handleSubmit.mutate(e)}
-                        >
+                        <>
                           {isLoading ? (
-                            <div className="w-full h-full">
-                              <Spinner fill="text-neutral-400" />
+                            <div className="flex items-center">
+                              <div className="w-full h-full">
+                                <Spinner fill="text-neutral-400" />
+                              </div>
                             </div>
                           ) : (
-                            <>
+                            <div
+                              className="flex items-center group cursor-pointer"
+                              onClick={(e) => handleSubmit.mutate(e)}
+                            >
                               <img
                                 src={checkEditGray}
                                 className="lg:group-hover:hidden"
@@ -288,9 +294,9 @@ const Profile = () => {
                                 src={checkEditRed}
                                 className="hidden lg:group-hover:block"
                               />
-                            </>
+                            </div>
                           )}
-                        </div>
+                        </>
                       ) : (
                         <div
                           className="flex items-center group cursor-pointer"

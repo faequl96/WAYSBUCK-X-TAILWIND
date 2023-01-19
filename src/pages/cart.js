@@ -61,7 +61,7 @@ const Cart = () => {
         pos_code: transactionData.pos_code,
         address: transactionData.address,
         total_price: totalPrice,
-        status: "Waiting Approve",
+        status: "Canceled",
         cart_id: cartId,
       });
 
