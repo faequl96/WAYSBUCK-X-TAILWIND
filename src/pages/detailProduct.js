@@ -120,7 +120,10 @@ const DetailProduct = () => {
                   </div>
                   <div className="flex items-center w-[64%] lg:w-full">
                     <div className="lg:w-full">
-                      <p className="text-red-700 text-[.96rem] font-semibold mt-1 mb-1 leading-[1.2rem] lg:text-center">
+                      <p
+                        className="text-red-700 text-[.96rem] font-semibold mt-1 mb-1 leading-[1.2rem] lg:text-center cursor-pointer"
+                        onClick={() => handlerCheckTopping(item.id, item.price)}
+                      >
                         {item.title}
                       </p>
                       <p className="text-red-900 lg:text-center">

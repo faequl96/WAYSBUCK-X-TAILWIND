@@ -1,5 +1,4 @@
 import { Disclosure } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import React, { useContext, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { API } from "../config/Api";
@@ -19,16 +18,24 @@ const Profile = () => {
   const contexts = useContext(AppContext);
   const [state] = useContext(UserContext);
   const [trans, setTrans] = useState();
-  const [profile, setProfile] = useState();
   const [isEditPhoto, setIsEditPhoto] = useState(false);
   const [isEditName, setIsEditName] = useState(false);
   const [isEditEmail, setIsEditEmail] = useState(false);
+  const [isEditPhone, setIsEditPhone] = useState(false);
+  const [isEditPosCode, setIsEditPosCode] = useState(false);
+  const [isEditAddress, setIsEditAddress] = useState(false);
   const [preview, setPreview] = useState();
   const [isLoading, setIsLoading] = useState(false);
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+
+  const [profile, setProfile] = useState();
   const [editData, setEditData] = useState({
     name: "",
     email: "",
     image: "",
+    phone: "",
+    pos_code: "",
+    address: "",
   });
 
   useEffect(() => {
@@ -63,7 +70,13 @@ const Profile = () => {
 
   useEffect(() => {
     setPreview(profile?.image);
-    setEditData({ name: profile?.name, email: profile?.email });
+    setEditData({
+      name: profile?.name,
+      email: profile?.email,
+      phone: profile?.phone,
+      pos_code: profile?.pos_code,
+      address: profile?.address,
+    });
   }, [profile]);
 
   const handleChange = (e) => {
@@ -88,6 +101,9 @@ const Profile = () => {
       const formData = new FormData();
       formData.set("name", editData.name);
       formData.set("email", editData.email);
+      formData.set("phone", editData.phone);
+      formData.set("pos_code", editData.pos_code);
+      formData.set("address", editData.address);
       if (editData?.image !== undefined) {
         formData.set("image", editData?.image[0], editData?.image[0]?.name);
       }
@@ -102,6 +118,9 @@ const Profile = () => {
       setIsEditPhoto(false);
       setIsEditName(false);
       setIsEditEmail(false);
+      setIsEditPhone(false);
+      setIsEditPosCode(false);
+      setIsEditAddress(false);
     } catch (error) {
       console.log(error);
     }
@@ -110,209 +129,430 @@ const Profile = () => {
   return (
     <div className="mt-20 lg:mt-32 py-4">
       <div className="lg:relative mx-auto max-w-6xl 2xl:max-w-7xl lg:px-10">
-        <div className="px-3 mb-5 lg:hidden">
-          <h2 className="text-3xl font-extrabold text-red-600 mb-2">
-            My Profile
-          </h2>
+        <div className="px-3 mb-3 lg:hidden">
+          <h2 className="text-3xl font-extrabold text-red-600">My Profile</h2>
         </div>
         <div className="lg:flex justify-between lg:mb-4">
-          <div className="px-3 lg:w-[50%] mb-16">
+          <div className="px-3 lg:w-[50%]">
             <div className="mb-8 hidden lg:block">
               <h2 className="text-3xl font-extrabold text-red-600 mb-2">
                 My Profile
               </h2>
             </div>
-            <div className="md:grid grid-cols-[360px,auto] lg:grid-cols-[200px,auto]">
-              <div className="w-100 h-48 md:h-auto flex justify-center relative">
-                <div className="aspect-[1/1] h-full relative">
-                  <div className="aspect-[1/1] rounded-full overflow-hidden flex items-center bg-slate-400">
-                    <img src={preview} className="w-full" />
+            <div
+              className={`pt-1 overflow-y-scroll md:overflow-y-auto ${
+                windowHeight < 600 ? "h-[56vh]" : "h-[70vh]"
+              }`}
+            >
+              <div className="md:grid grid-cols-[280px,auto] lg:grid-cols-[160px,auto] xl:grid-cols-[200px,auto] mb-4">
+                <div className="w-100 h-32 md:h-64 lg:h-40 xl:h-48 flex justify-center md:justify-start relative">
+                  <div className="aspect-[1/1] h-full relative">
+                    <div className="aspect-[1/1] rounded-full overflow-hidden flex items-center border-8">
+                      <img src={preview} className="w-full" />
+                    </div>
+                    {isEditPhoto && (
+                      <>
+                        <form>
+                          <input
+                            id="photo"
+                            type="file"
+                            name="image"
+                            className="hidden"
+                            onChange={handleChange}
+                          />
+                        </form>
+                        <label htmlFor="photo">
+                          <img
+                            src={editPhoto}
+                            className="absolute inset-0 bg-opacity-70 bg-[#333] cursor-pointer rounded-full"
+                          />
+                        </label>
+                      </>
+                    )}
                   </div>
-                  {isEditPhoto && (
+                  {isEditPhoto ? (
                     <>
-                      <form>
-                        <input
-                          id="photo"
-                          type="file"
-                          name="image"
-                          className="hidden"
-                          onChange={handleChange}
-                        />
-                      </form>
-                      <label htmlFor="photo">
-                        <img
-                          src={editPhoto}
-                          className="absolute inset-0 bg-opacity-70 bg-[#333] cursor-pointer rounded-full"
-                        />
-                      </label>
+                      {isLoading ? (
+                        <div className="h-[28px] w-[28px] lg:h-[24px] lg:w-[24px] absolute right-0 bottom-0 lg:-right-1 lg:-bottom-1">
+                          <div className="w-full h-full">
+                            <Spinner fill="text-neutral-400" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          className="h-[28px] w-[28px] lg:h-[24px] lg:w-[24px] absolute right-0 md:right-6 bottom-0 lg:-right-1 xl:right-0 lg:bottom-0 cursor-pointer group"
+                          onClick={(e) => handleSubmit.mutate(e)}
+                        >
+                          <img
+                            src={checkEditGray}
+                            className="lg:group-hover:hidden"
+                          />
+                          <img
+                            src={checkEditRed}
+                            className="hidden lg:group-hover:block"
+                          />
+                        </div>
+                      )}
                     </>
+                  ) : (
+                    <div
+                      className="h-[28px] w-[28px] lg:h-[24px] lg:w-[24px] absolute right-0 md:right-6 bottom-0 lg:-right-1 xl:right-0 lg:bottom-0 cursor-pointer group"
+                      onClick={() => setIsEditPhoto(true)}
+                    >
+                      <img
+                        src={editIconGray}
+                        className="lg:group-hover:hidden"
+                      />
+                      <img
+                        src={editIconRed}
+                        className="hidden lg:group-hover:block"
+                      />
+                    </div>
                   )}
                 </div>
-                {isEditPhoto ? (
-                  <>
-                    {isLoading ? (
-                      <div className="h-[32px] w-[32px] lg:h-[30px] lg:w-[30px] absolute right-0 bottom-0 lg:-right-1 lg:-bottom-1">
-                        <div className="w-full h-full">
-                          <Spinner fill="text-neutral-400" />
-                        </div>
-                      </div>
-                    ) : (
-                      <div
-                        className="h-[32px] w-[32px] lg:h-[30px] lg:w-[30px] absolute right-0 bottom-0 lg:-right-1 lg:-bottom-1 cursor-pointer group"
-                        onClick={(e) => handleSubmit.mutate(e)}
-                      >
-                        <img
-                          src={checkEditGray}
-                          className="lg:group-hover:hidden"
-                        />
-                        <img
-                          src={checkEditRed}
-                          className="hidden lg:group-hover:block"
-                        />
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div
-                    className="h-[32px] w-[32px] lg:h-[30px] lg:w-[30px] absolute right-0 bottom-0 lg:-right-1 lg:-bottom-1 cursor-pointer group"
-                    onClick={() => setIsEditPhoto(true)}
-                  >
-                    <img src={editIconGray} className="lg:group-hover:hidden" />
-                    <img
-                      src={editIconRed}
-                      className="hidden lg:group-hover:block"
-                    />
-                  </div>
-                )}
-              </div>
 
-              <div className="mt-12 md:mt-0 md:pl-20 lg:pl-8 lg:pr-6 md:flex items-center">
-                <div className="w-full">
-                  {/* EDIT NAME */}
-                  <div>
-                    <h5 className="font-semibold text-lg">Name :</h5>
-                    <div className="grid grid-cols-[auto,32px] lg:grid-cols-[auto,30px] mb-4">
-                      <div className="flex items-center w-full">
+                <div className="mt-4 md:mt-0 md:pl-20 lg:pl-8 lg:pr-6 md:flex items-center">
+                  <div className="w-full">
+                    {/* START OF EDIT NAME */}
+                    <div>
+                      <h5 className="font-semibold text-lg leading-4 lg:text-md md:leading-5">
+                        Name :
+                      </h5>
+                      <div className="grid grid-cols-[auto,28px] lg:grid-cols-[auto,24px] mb-4">
+                        <div className="flex items-center w-full">
+                          {isEditName ? (
+                            <form className="w-full pr-3">
+                              <input
+                                type="text"
+                                name="name"
+                                autoFocus
+                                onFocus={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
+                                onBlur={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
+                                className="p-0 w-full border-0 focus:ring-0 underline text-slate-500"
+                                value={editData.name}
+                                onChange={handleChange}
+                              />
+                            </form>
+                          ) : (
+                            <span className="block w-full pr-3">
+                              {profile?.name}
+                            </span>
+                          )}
+                        </div>
                         {isEditName ? (
-                          <form className="w-full pr-3">
-                            <input
-                              type="text"
-                              name="name"
-                              autoFocus
-                              className="p-0 w-full border-0 focus:ring-0 underline text-slate-500"
-                              value={editData.name}
-                              onChange={handleChange}
-                            />
-                          </form>
+                          <>
+                            {isLoading ? (
+                              <div className="flex items-center">
+                                <div className="w-full h-full">
+                                  <Spinner fill="text-neutral-400" />
+                                </div>
+                              </div>
+                            ) : (
+                              <div
+                                className="flex items-center group cursor-pointer"
+                                onClick={(e) => handleSubmit.mutate(e)}
+                              >
+                                <img
+                                  src={checkEditGray}
+                                  className="lg:group-hover:hidden"
+                                />
+                                <img
+                                  src={checkEditRed}
+                                  className="hidden lg:group-hover:block"
+                                />
+                              </div>
+                            )}
+                          </>
                         ) : (
-                          <span className="block w-full pr-3">
-                            {profile?.name}
-                          </span>
+                          <div
+                            className="flex items-center group cursor-pointer"
+                            onClick={() => setIsEditName(true)}
+                          >
+                            <img
+                              src={editIconGray}
+                              className="lg:group-hover:hidden"
+                            />
+                            <img
+                              src={editIconRed}
+                              className="hidden lg:group-hover:block"
+                            />
+                          </div>
                         )}
                       </div>
-                      {isEditName ? (
-                        <>
-                          {isLoading ? (
-                            <div className="flex items-center">
-                              <div className="w-full h-full">
-                                <Spinner fill="text-neutral-400" />
-                              </div>
-                            </div>
-                          ) : (
-                            <div
-                              className="flex items-center group cursor-pointer"
-                              onClick={(e) => handleSubmit.mutate(e)}
-                            >
-                              <img
-                                src={checkEditGray}
-                                className="lg:group-hover:hidden"
-                              />
-                              <img
-                                src={checkEditRed}
-                                className="hidden lg:group-hover:block"
-                              />
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <div
-                          className="flex items-center group cursor-pointer"
-                          onClick={() => setIsEditName(true)}
-                        >
-                          <img
-                            src={editIconGray}
-                            className="lg:group-hover:hidden"
-                          />
-                          <img
-                            src={editIconRed}
-                            className="hidden lg:group-hover:block"
-                          />
-                        </div>
-                      )}
                     </div>
-                  </div>
-                  {/* EDIT EMAIL */}
-                  <div>
-                    <h5 className="font-semibold text-lg">Email :</h5>
-                    <div className="grid grid-cols-[auto,32px] lg:grid-cols-[auto,30px] mb-4">
-                      <div className="flex items-center w-full">
+                    {/* END OF EDIT NAME */}
+                    {/* START OF EDIT EMAIL */}
+                    <div>
+                      <h5 className="font-semibold text-lg leading-4 lg:text-md md:leading-5">
+                        Email :
+                      </h5>
+                      <div className="grid grid-cols-[auto,28px] lg:grid-cols-[auto,24px] mb-4">
+                        <div className="flex items-center w-full">
+                          {isEditEmail ? (
+                            <form className="w-full pr-3">
+                              <input
+                                type="email"
+                                name="email"
+                                autoFocus
+                                onFocus={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
+                                onBlur={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
+                                className="p-0 w-full border-0 focus:ring-0 underline text-slate-500"
+                                value={editData.email}
+                                onChange={handleChange}
+                              />
+                            </form>
+                          ) : (
+                            <span className="block w-full pr-3">
+                              {profile?.email}
+                            </span>
+                          )}
+                        </div>
                         {isEditEmail ? (
-                          <form className="w-full pr-3">
-                            <input
-                              type="email"
-                              name="email"
-                              autoFocus
-                              className="p-0 w-full border-0 focus:ring-0 underline text-slate-500"
-                              value={editData.email}
-                              onChange={handleChange}
-                            />
-                          </form>
+                          <>
+                            {isLoading ? (
+                              <div className="flex items-center">
+                                <div className="w-full h-full">
+                                  <Spinner fill="text-neutral-400" />
+                                </div>
+                              </div>
+                            ) : (
+                              <div
+                                className="flex items-center group cursor-pointer"
+                                onClick={(e) => handleSubmit.mutate(e)}
+                              >
+                                <img
+                                  src={checkEditGray}
+                                  className="lg:group-hover:hidden"
+                                />
+                                <img
+                                  src={checkEditRed}
+                                  className="hidden lg:group-hover:block"
+                                />
+                              </div>
+                            )}
+                          </>
                         ) : (
-                          <span className="block w-full pr-3">
-                            {profile?.email}
-                          </span>
+                          <div
+                            className="flex items-center group cursor-pointer"
+                            onClick={() => setIsEditEmail(true)}
+                          >
+                            <img
+                              src={editIconGray}
+                              className="lg:group-hover:hidden"
+                            />
+                            <img
+                              src={editIconRed}
+                              className="hidden lg:group-hover:block"
+                            />
+                          </div>
                         )}
                       </div>
-                      {isEditEmail ? (
-                        <>
-                          {isLoading ? (
-                            <div className="flex items-center">
-                              <div className="w-full h-full">
-                                <Spinner fill="text-neutral-400" />
-                              </div>
-                            </div>
-                          ) : (
-                            <div
-                              className="flex items-center group cursor-pointer"
-                              onClick={(e) => handleSubmit.mutate(e)}
-                            >
-                              <img
-                                src={checkEditGray}
-                                className="lg:group-hover:hidden"
-                              />
-                              <img
-                                src={checkEditRed}
-                                className="hidden lg:group-hover:block"
-                              />
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <div
-                          className="flex items-center group cursor-pointer"
-                          onClick={() => setIsEditEmail(true)}
-                        >
-                          <img
-                            src={editIconGray}
-                            className="lg:group-hover:hidden"
-                          />
-                          <img
-                            src={editIconRed}
-                            className="hidden lg:group-hover:block"
-                          />
-                        </div>
-                      )}
                     </div>
+                    {/* END OF EDIT EMAIL */}
+                    {/* START OF EDIT PHONE */}
+                    <div>
+                      <h5 className="font-semibold text-lg leading-4 lg:text-md md:leading-5">
+                        Phone :
+                      </h5>
+                      <div className="grid grid-cols-[auto,28px] lg:grid-cols-[auto,24px] mb-4">
+                        <div className="flex items-center w-full">
+                          {isEditPhone ? (
+                            <form className="w-full pr-3">
+                              <input
+                                type="text"
+                                name="phone"
+                                autoFocus
+                                onFocus={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
+                                onBlur={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
+                                className="p-0 w-full border-0 focus:ring-0 underline text-slate-500"
+                                value={editData.phone}
+                                onChange={handleChange}
+                              />
+                            </form>
+                          ) : (
+                            <span className="block w-full pr-3">
+                              {profile?.phone !== "" ? profile?.phone : "-"}
+                            </span>
+                          )}
+                        </div>
+                        {isEditPhone ? (
+                          <>
+                            {isLoading ? (
+                              <div className="flex items-center">
+                                <div className="w-full h-full">
+                                  <Spinner fill="text-neutral-400" />
+                                </div>
+                              </div>
+                            ) : (
+                              <div
+                                className="flex items-center group cursor-pointer"
+                                onClick={(e) => handleSubmit.mutate(e)}
+                              >
+                                <img
+                                  src={checkEditGray}
+                                  className="lg:group-hover:hidden"
+                                />
+                                <img
+                                  src={checkEditRed}
+                                  className="hidden lg:group-hover:block"
+                                />
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div
+                            className="flex items-center group cursor-pointer"
+                            onClick={() => setIsEditPhone(true)}
+                          >
+                            <img
+                              src={editIconGray}
+                              className="lg:group-hover:hidden"
+                            />
+                            <img
+                              src={editIconRed}
+                              className="hidden lg:group-hover:block"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {/* END OF EDIT PHONE */}
+                    {/* START OF EDIT POS CODE */}
+                    <div>
+                      <h5 className="font-semibold text-lg leading-4 lg:text-md md:leading-5">
+                        Pos Code :
+                      </h5>
+                      <div className="grid grid-cols-[auto,28px] lg:grid-cols-[auto,24px] mb-4">
+                        <div className="flex items-center w-full">
+                          {isEditPosCode ? (
+                            <form className="w-full pr-3">
+                              <input
+                                type="text"
+                                name="pos_code"
+                                autoFocus
+                                onFocus={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
+                                onBlur={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
+                                className="p-0 w-full border-0 focus:ring-0 underline text-slate-500"
+                                value={editData.pos_code}
+                                onChange={handleChange}
+                              />
+                            </form>
+                          ) : (
+                            <span className="block w-full pr-3">
+                              {profile?.pos_code !== "" ? profile?.pos_code : "-"}
+                            </span>
+                          )}
+                        </div>
+                        {isEditPosCode ? (
+                          <>
+                            {isLoading ? (
+                              <div className="flex items-center">
+                                <div className="w-full h-full">
+                                  <Spinner fill="text-neutral-400" />
+                                </div>
+                              </div>
+                            ) : (
+                              <div
+                                className="flex items-center group cursor-pointer"
+                                onClick={(e) => handleSubmit.mutate(e)}
+                              >
+                                <img
+                                  src={checkEditGray}
+                                  className="lg:group-hover:hidden"
+                                />
+                                <img
+                                  src={checkEditRed}
+                                  className="hidden lg:group-hover:block"
+                                />
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div
+                            className="flex items-center group cursor-pointer"
+                            onClick={() => setIsEditPosCode(true)}
+                          >
+                            <img
+                              src={editIconGray}
+                              className="lg:group-hover:hidden"
+                            />
+                            <img
+                              src={editIconRed}
+                              className="hidden lg:group-hover:block"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {/* END OF EDIT POS CODE */}
+                    {/* START OF EDIT ADDRESS */}
+                    <div className="">
+                      <h5 className="font-semibold text-lg leading-4 lg:text-md md:leading-5">
+                        Address :
+                      </h5>
+                      <div className="grid grid-cols-[auto,28px] lg:grid-cols-[auto,24px] mb-4">
+                        <div className="flex items-center w-full">
+                          {isEditAddress ? (
+                            <form className="w-full pr-3">
+                              <input
+                                type="text"
+                                name="address"
+                                autoFocus
+                                onFocus={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
+                                onBlur={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
+                                className="p-0 w-full border-0 focus:ring-0 underline text-slate-500"
+                                value={editData.address}
+                                onChange={handleChange}
+                              />
+                            </form>
+                          ) : (
+                            <span className="block w-full pr-3 leading-[1.2rem] mt-1">
+                              {profile?.address !== "" ? profile?.address : "-"}
+                            </span>
+                          )}
+                        </div>
+                        {isEditAddress ? (
+                          <>
+                            {isLoading ? (
+                              <div className="flex items-center">
+                                <div className="w-full h-full">
+                                  <Spinner fill="text-neutral-400" />
+                                </div>
+                              </div>
+                            ) : (
+                              <div
+                                className="group cursor-pointer"
+                                onClick={(e) => handleSubmit.mutate(e)}
+                              >
+                                <img
+                                  src={checkEditGray}
+                                  className="lg:group-hover:hidden"
+                                />
+                                <img
+                                  src={checkEditRed}
+                                  className="hidden lg:group-hover:block"
+                                />
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div
+                            className="group cursor-pointer"
+                            onClick={() => setIsEditAddress(true)}
+                          >
+                            <img
+                              src={editIconGray}
+                              className="lg:group-hover:hidden"
+                            />
+                            <img
+                              src={editIconRed}
+                              className="hidden lg:group-hover:block"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {/* END OF EDIT ADDRESS */}
                   </div>
                 </div>
               </div>
@@ -355,7 +595,7 @@ const Profile = () => {
                         My Transactions
                       </h2>
                     </div>
-                    <div className="px-3 h-[80vh] overflow-y-scroll pt-3 pb-24">
+                    <div className="flex flex-col-reverse px-3 h-[80vh] overflow-y-scroll pt-3 pb-24">
                       {trans !== 0 && trans !== undefined && (
                         <>
                           {trans?.map((trans) => (

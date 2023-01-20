@@ -8,11 +8,18 @@ import { API } from "../config/Api";
 import { useMutation, useQuery } from "react-query";
 import Arrow from "../components/icon/arrow";
 import Spinner from "../components/feedback/spinner2";
+import Toggle from "../components/interaction/toggle";
 
 const Cart = () => {
   const contexts = useContext(AppContext);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [enabled, setEnabled] = useState(false);
+
+  const [requiredRecepient, setRequiredRecepient] = useState(false);
+  const [requiredPhone, setRequiredPhone] = useState(false);
+  const [requiredPosCode, setRequiredPosCode] = useState(false);
+  const [requiredAddress, setRequiredAddress] = useState(false);
 
   let { data: cart, refetch } = useQuery("cartsCache", async () => {
     const response = await API.get("/cart");
@@ -21,6 +28,7 @@ const Cart = () => {
 
     if (response.data.data === 0) {
       contexts.setCartLength(0);
+      return [];
     } else {
       contexts.setCartLength(response.data.data.length);
       return response.data.data;
@@ -38,32 +46,112 @@ const Cart = () => {
     refetch();
   };
 
-  let [transactionData, setTransactionData] = useState({
+  const [profile, setProfile] = useState();
+
+  useEffect(() => {
+    async function getDataProfile() {
+      const result = await API.get(`/user`);
+      setProfile(result.data.data);
+    }
+    getDataProfile();
+  }, []);
+
+  let [shippingForMe, setShippingForMe] = useState({
     name: "",
     email: "",
+    recepient_name: "",
+    phone: "",
+    pos_code: "",
+    address: "",
+  });
+
+  useEffect(() => {
+    setShippingForMe({
+      name: profile?.name,
+      email: profile?.email,
+      recepient_name: profile?.name,
+      phone: profile?.phone,
+      pos_code: profile?.pos_code,
+      address: profile?.address,
+    });
+  }, [profile]);
+
+  let [shippingForSomeOneElse, setShippingForSomeOneElse] = useState({
+    name: profile?.name,
+    email: profile?.email,
+    recepient_name: "",
     phone: "",
     pos_code: "",
     address: "",
   });
 
   const OnChangeFormTrans = (e) =>
-    setTransactionData({ ...transactionData, [e.target.name]: e.target.value });
+    setShippingForSomeOneElse({
+      ...shippingForSomeOneElse,
+      [e.target.name]: e.target.value,
+    });
 
   const handlerTransaction = useMutation(async (e) => {
     try {
       e.preventDefault();
 
       const config = { headers: { "Content-type": "application/json" } };
-      let body = JSON.stringify({
-        name: transactionData.name,
-        email: transactionData.email,
-        phone: transactionData.phone,
-        pos_code: transactionData.pos_code,
-        address: transactionData.address,
+
+      let transData = {
+        name: profile.name,
+        email: profile.email,
+        recepient_name: "",
+        phone: "",
+        pos_code: "",
+        address: "",
         total_price: totalPrice,
         status: "Canceled",
         cart_id: cartId,
-      });
+      };
+
+      if (enabled) {
+        transData.recepient_name = shippingForSomeOneElse.recepient_name;
+        transData.phone = shippingForSomeOneElse.phone;
+        transData.pos_code = shippingForSomeOneElse.pos_code;
+        transData.address = shippingForSomeOneElse.address;
+      } else {
+        transData.recepient_name = shippingForMe.recepient_name;
+        transData.phone = shippingForMe.phone;
+        transData.pos_code = shippingForMe.pos_code;
+        transData.address = shippingForMe.address;
+      }
+
+      const body = JSON.stringify(transData);
+
+      if (
+        transData.recepient_name === "" ||
+        transData.phone === "" ||
+        transData.pos_code === "" ||
+        transData.address === ""
+      ) {
+        if (transData.recepient_name === "") {
+          setRequiredRecepient(true);
+        } else {
+          setRequiredRecepient(false);
+        }
+        if (transData.phone === "") {
+          setRequiredPhone(true);
+        } else {
+          setRequiredPhone(false);
+        }
+        if (transData.pos_code === "") {
+          setRequiredPosCode(true);
+        } else {
+          setRequiredPosCode(false);
+        }
+        if (transData.address === "") {
+          setRequiredAddress(true);
+        } else {
+          setRequiredAddress(false);
+        }
+
+        return;
+      }
 
       const resMidtrans = await API.post("/create-transaction", body, config);
       const token = resMidtrans.data.data.token;
@@ -136,9 +224,10 @@ const Cart = () => {
       }
 
       refetch();
-      setTransactionData({
-        name: "",
-        email: "",
+      setShippingForSomeOneElse({
+        name: profile?.name,
+        email: profile?.email,
+        recepient_name: "",
         phone: "",
         pos_code: "",
         address: "",
@@ -244,13 +333,13 @@ const Cart = () => {
                             <Transition
                               as={Fragment}
                               enter="transition ease-out duration-100"
-                              enterFrom="transform opacity-0 scale-95"
+                              enterFrom="transform opacity-0"
                               enterTo="transform opacity-100 scale-100"
                               leave="transition ease-in duration-75"
                               leaveFrom="transform opacity-100 scale-100"
-                              leaveTo="transform opacity-0 scale-95"
+                              leaveTo="transform opacity-0"
                             >
-                              <Menu.Items className="fixed inset-0 z-[999] flex items-center px-3 bg-black bg-opacity-60 backdrop-blur">
+                              <Menu.Items className="fixed inset-0 z-[999] flex items-center px-3 bg-black bg-opacity-60">
                                 <div className="w-full md:max-w-md rounded-lg bg-white shadow-xl mb-6 pb-6 px-4 mx-auto border-2 border-red-500">
                                   <h3 className="mt-6 text-center text-2xl font-bold tracking-tight text-red-600 mb-6">
                                     Are you sure?
@@ -298,7 +387,7 @@ const Cart = () => {
                             leaveFrom="transform opacity-100 scale-100"
                             leaveTo="transform opacity-0 scale-95"
                           >
-                            <Menu.Items className="fixed inset-0 z-[999] flex items-center bg-black bg-opacity-60 backdrop-blur">
+                            <Menu.Items className="fixed inset-0 z-[999] flex items-center bg-black bg-opacity-60">
                               <div className="w-full md:max-w-md rounded-lg bg-white shadow-xl mb-6 pb-6 px-4 mx-auto border-2 border-red-500">
                                 <h3 className="mt-6 text-center text-2xl font-bold tracking-tight text-red-600 mb-6">
                                   Are you sure?
@@ -364,7 +453,7 @@ const Cart = () => {
 
           <Disclosure
             as="div"
-            className="fixed bg-white bg-opacity-60 backdrop-blur lg:static w-full left-0 right-0 bottom-0 z-[99] lg:w-[40%]"
+            className={`fixed bg-white bg-opacity-60 backdrop-blur lg:static w-full left-0 right-0 bottom-0 z-[99] lg:w-[40%]`}
           >
             {({ open }) => (
               <>
@@ -438,63 +527,91 @@ const Cart = () => {
                 )}
                 <Disclosure.Panel className="lg:hidden">
                   <div className="space-y-1 px-3 pt-2">
-                    <form>
-                      <div className="mb-3">
-                        <input
-                          name="name"
-                          type="text"
-                          required
-                          className="block w-full rounded-md border-[2px] border-red-600 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
-                          placeholder="Name"
-                          value={transactionData.name}
-                          onChange={OnChangeFormTrans}
+                    <div className="grid grid-cols-[auto,60px] mb-2">
+                      <div>
+                        <h6>Shipping For Someone Else</h6>
+                      </div>
+                      <div className="text-end">
+                        <Toggle
+                          enabled={enabled}
+                          setEnabled={setEnabled}
+                          bgEnabled={"bg-red-600"}
+                          bgDisabled={"bg-slate-500"}
                         />
                       </div>
-                      <div className="mb-3">
-                        <input
-                          name="email"
-                          type="email"
-                          required
-                          className="block w-full rounded-md border-[2px] border-red-600 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
-                          placeholder="Email"
-                          value={transactionData.email}
-                          onChange={OnChangeFormTrans}
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <input
-                          name="phone"
-                          type="text"
-                          required
-                          className="block w-full rounded-md border-[2px] border-red-600 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
-                          placeholder="Phone"
-                          value={transactionData.phone}
-                          onChange={OnChangeFormTrans}
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <input
-                          name="pos_code"
-                          type="text"
-                          required
-                          className="block w-full rounded-md border-[2px] border-red-600 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
-                          placeholder="Pos Code"
-                          value={transactionData.pos_code}
-                          onChange={OnChangeFormTrans}
-                        />
-                      </div>
-                      <div className="mb-2">
-                        <input
-                          name="address"
-                          type="text"
-                          required
-                          className="block w-full rounded-md border-[2px] border-red-600 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
-                          placeholder="Address"
-                          value={transactionData.address}
-                          onChange={OnChangeFormTrans}
-                        />
-                      </div>
-                    </form>
+                    </div>
+                    {enabled && (
+                      <form>
+                        <div className="mb-3 relative">
+                          <input
+                            name="recepient_name"
+                            type="text"
+                            required
+                            className="block w-full rounded-md border-[2px] border-red-600 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
+                            placeholder="Recepient Name"
+                            value={shippingForSomeOneElse.recepient_name}
+                            onChange={OnChangeFormTrans}
+                            onClick={() => setRequiredRecepient(false)}
+                          />
+                          {requiredRecepient && (
+                            <div className="absolute right-0 top-[10px] px-3 text-red-500">
+                              *Required
+                            </div>
+                          )}
+                        </div>
+                        <div className="mb-3 relative">
+                          <input
+                            name="phone"
+                            type="text"
+                            required
+                            className="block w-full rounded-md border-[2px] border-red-600 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
+                            placeholder="Phone"
+                            value={shippingForSomeOneElse.phone}
+                            onChange={OnChangeFormTrans}
+                            onClick={() => setRequiredPhone(false)}
+                          />
+                          {requiredPhone && (
+                            <div className="absolute right-0 top-[10px] px-3 text-red-500">
+                              *Required
+                            </div>
+                          )}
+                        </div>
+                        <div className="mb-3 relative">
+                          <input
+                            name="pos_code"
+                            type="text"
+                            required
+                            className="block w-full rounded-md border-[2px] border-red-600 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
+                            placeholder="Pos Code"
+                            value={shippingForSomeOneElse.pos_code}
+                            onChange={OnChangeFormTrans}
+                            onClick={() => setRequiredPosCode(false)}
+                          />
+                          {requiredPosCode && (
+                            <div className="absolute right-0 top-[10px] px-3 text-red-500">
+                              *Required
+                            </div>
+                          )}
+                        </div>
+                        <div className="mb-2 relative">
+                          <input
+                            name="address"
+                            type="text"
+                            required
+                            className="block w-full rounded-md border-[2px] border-red-600 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
+                            placeholder="Address"
+                            value={shippingForSomeOneElse.address}
+                            onChange={OnChangeFormTrans}
+                            onClick={() => setRequiredAddress(false)}
+                          />
+                          {requiredAddress && (
+                            <div className="absolute right-0 top-[10px] px-3 text-red-500">
+                              *Required
+                            </div>
+                          )}
+                        </div>
+                      </form>
+                    )}
                     <div className="h-14 grid grid-cols-[auto,140px] items-center lg:hidden">
                       <div className="py-2">
                         <div className="flex items-center">
@@ -511,12 +628,76 @@ const Cart = () => {
                         </div>
                       </div>
                       <div className="h-14 flex justify-end items-center">
-                        <button
-                          className="py-2 w-32 lg:text-xl lg:w-full rounded-md bg-red-600 hover:bg-red-500 font-bold text-white focus:outline-none"
-                          onClick={(e) => handlerTransaction.mutate(e)}
-                        >
-                          Pay
-                        </button>
+                        {cart?.length === 0 ? (
+                          <button className="py-2 w-32 lg:text-xl lg:w-full rounded-md bg-slate-500 cursor-default font-bold text-white focus:outline-none">
+                            Pay
+                          </button>
+                        ) : (
+                          <>
+                            {enabled ? (
+                              <button
+                                className="py-2 w-32 lg:text-xl lg:w-full rounded-md bg-red-600 hover:bg-red-500 font-bold text-white focus:outline-none"
+                                onClick={(e) => handlerTransaction.mutate(e)}
+                              >
+                                Pay
+                              </button>
+                            ) : (
+                              <>
+                                {profile?.phone === "" ||
+                                profile?.pos_code === "" ||
+                                profile?.address === "" ? (
+                                  <>
+                                    <Menu as="div">
+                                      <Menu.Button className="py-2 w-32 lg:text-xl lg:w-full rounded-md bg-red-600 hover:bg-red-500 font-bold text-white focus:outline-none">
+                                        Pay
+                                      </Menu.Button>
+                                      <Transition
+                                        as={Fragment}
+                                        enter="transition ease-out duration-100"
+                                        enterFrom="transform opacity-0"
+                                        enterTo="transform opacity-100 scale-100"
+                                        leave="transition ease-in duration-75"
+                                        leaveFrom="transform opacity-100 scale-100"
+                                        leaveTo="transform opacity-0"
+                                      >
+                                        <Menu.Items className="fixed -top-[88vh] -bottom-[10vh] inset-x-0 h-[120vh] z-[999] flex items-center px-3 bg-black bg-opacity-60">
+                                          <div className="w-full md:max-w-md rounded-lg bg-white shadow-xl mb-6 pb-6 px-4 mx-auto border-2 border-red-500">
+                                            <h3 className="mt-6 text-center text-xl font-semibold tracking-tight text-slate-700 mb-6">
+                                              Your profile is not completed! Do
+                                              you want to complete it?
+                                            </h3>
+                                            <div className="flex justify-center gap-2">
+                                              <Menu.Button className="bg-red-600 w-24 py-1 font-bold text-white rounded-md hover:bg-red-500">
+                                                No
+                                              </Menu.Button>
+                                              <button
+                                                className="flex justify-center items-center bg-slate-500 w-24 py-1 font-bold text-white rounded-md hover:bg-slate-400"
+                                                onClick={() =>
+                                                  navigate("/customer/profile")
+                                                }
+                                              >
+                                                Yes
+                                              </button>
+                                            </div>
+                                          </div>
+                                        </Menu.Items>
+                                      </Transition>
+                                    </Menu>
+                                  </>
+                                ) : (
+                                  <button
+                                    className="py-2 w-32 lg:text-xl lg:w-full rounded-md bg-red-600 hover:bg-red-500 font-bold text-white focus:outline-none"
+                                    onClick={(e) =>
+                                      handlerTransaction.mutate(e)
+                                    }
+                                  >
+                                    Pay
+                                  </button>
+                                )}
+                              </>
+                            )}
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -526,23 +707,12 @@ const Cart = () => {
                   <form>
                     <div className="mb-6">
                       <input
-                        name="name"
+                        name="recepient_name"
                         type="text"
                         required
                         className="block w-full rounded-md border-[2px] border-red-600 px-3 py-3 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
-                        placeholder="Name"
-                        value={transactionData.name}
-                        onChange={OnChangeFormTrans}
-                      />
-                    </div>
-                    <div className="mb-6">
-                      <input
-                        name="email"
-                        type="email"
-                        required
-                        className="block w-full rounded-md border-[2px] border-red-600 px-3 py-3 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
-                        placeholder="Email"
-                        value={transactionData.email}
+                        placeholder="Recepient Name"
+                        value={shippingForSomeOneElse.recepient_name}
                         onChange={OnChangeFormTrans}
                       />
                     </div>
@@ -553,7 +723,7 @@ const Cart = () => {
                         required
                         className="block w-full rounded-md border-[2px] border-red-600 px-3 py-3 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
                         placeholder="Phone"
-                        value={transactionData.phone}
+                        value={shippingForSomeOneElse.phone}
                         onChange={OnChangeFormTrans}
                       />
                     </div>
@@ -564,7 +734,7 @@ const Cart = () => {
                         required
                         className="block w-full rounded-md border-[2px] border-red-600 px-3 py-3 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
                         placeholder="Pos Code"
-                        value={transactionData.pos_code}
+                        value={shippingForSomeOneElse.pos_code}
                         onChange={OnChangeFormTrans}
                       />
                     </div>
@@ -575,7 +745,7 @@ const Cart = () => {
                         required
                         className="block w-full rounded-md border-[2px] border-red-600 px-3 py-3 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
                         placeholder="Address"
-                        value={transactionData.address}
+                        value={shippingForSomeOneElse.address}
                         onChange={OnChangeFormTrans}
                       />
                     </div>

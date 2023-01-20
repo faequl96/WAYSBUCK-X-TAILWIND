@@ -4,11 +4,13 @@ import { useMutation } from "react-query";
 import { API, setAuthToken } from "../config/Api";
 import { UserContext } from "./userContext";
 import { Alert } from "flowbite-react";
+import { useNavigate } from "react-router-dom";
 
 export const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
   const [state, dispatch] = useContext(UserContext);
+  const navigate = useNavigate();
 
   // ==================================================================================================================================
   // GLOBAL STATES ====================================================================================================================
@@ -162,6 +164,7 @@ export const AppContextProvider = ({ children }) => {
       setShowLogin(false);
       setLoginMessage("");
       setLoginData({ email: "", password: "" });
+      navigate("/")
     } catch (err) {
       console.log(err);
       const alert = (
