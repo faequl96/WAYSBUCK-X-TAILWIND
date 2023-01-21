@@ -1,5 +1,5 @@
 import React, { Fragment, useContext, useEffect, useState } from "react";
-import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { AppContext } from "../contexts/appContexts";
 import trashIcon from "../assets/trash.png";
@@ -339,7 +339,7 @@ const Cart = () => {
                               leaveFrom="transform opacity-100 scale-100"
                               leaveTo="transform opacity-0"
                             >
-                              <Menu.Items className="fixed inset-0 z-[999] flex items-center px-3 bg-black bg-opacity-60">
+                              <Menu.Items className="fixed inset-0 z-[999] flex items-center px-3">
                                 <div className="w-full md:max-w-md rounded-lg bg-white shadow-xl mb-6 pb-6 px-4 mx-auto border-2 border-red-500">
                                   <h3 className="mt-6 text-center text-2xl font-bold tracking-tight text-red-600 mb-6">
                                     Are you sure?
@@ -387,7 +387,7 @@ const Cart = () => {
                             leaveFrom="transform opacity-100 scale-100"
                             leaveTo="transform opacity-0 scale-95"
                           >
-                            <Menu.Items className="fixed inset-0 z-[999] flex items-center bg-black bg-opacity-60">
+                            <Menu.Items className="fixed inset-0 z-[999] flex items-center">
                               <div className="w-full md:max-w-md rounded-lg bg-white shadow-xl mb-6 pb-6 px-4 mx-auto border-2 border-red-500">
                                 <h3 className="mt-6 text-center text-2xl font-bold tracking-tight text-red-600 mb-6">
                                   Are you sure?
@@ -506,7 +506,7 @@ const Cart = () => {
                     )}
                   </div>
                 ) : (
-                  <div className="h-14 grid grid-cols-[auto,140px] items-center pl-3 pr-1 lg:hidden border-t-2 bg-white">
+                  <div className="h-14 flex justify-between items-center px-3 lg:hidden border-t-2">
                     <div className="py-2">
                       <div className="flex items-center">
                         <h5 className="text-lg font-semibold text-gray-600">
@@ -517,8 +517,8 @@ const Cart = () => {
                     {open ? (
                       <></>
                     ) : (
-                      <Disclosure.Button className="flex justify-end items-center">
-                        <div className="w-12 h-12 scale-110 rotate-180">
+                      <Disclosure.Button className="flex justify-center items-center">
+                        <div className="w-[30px] h-[30px] scale-[180%] rotate-180">
                           <Arrow fill="text-red-600" />
                         </div>
                       </Disclosure.Button>
@@ -660,7 +660,7 @@ const Cart = () => {
                                         leaveFrom="transform opacity-100 scale-100"
                                         leaveTo="transform opacity-0"
                                       >
-                                        <Menu.Items className="fixed -top-[88vh] -bottom-[10vh] inset-x-0 h-[120vh] z-[999] flex items-center px-3 bg-black bg-opacity-60">
+                                        <Menu.Items className="fixed -top-[88vh] -bottom-[10vh] inset-x-0 h-[120vh] z-[999] flex items-center px-3">
                                           <div className="w-full md:max-w-md rounded-lg bg-white shadow-xl mb-6 pb-6 px-4 mx-auto border-2 border-red-500">
                                             <h3 className="mt-6 text-center text-xl font-semibold tracking-tight text-slate-700 mb-6">
                                               Your profile is not completed! Do

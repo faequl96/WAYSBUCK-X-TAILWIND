@@ -1,5 +1,5 @@
-import { Disclosure } from "@headlessui/react";
-import React, { useContext, useEffect, useState } from "react";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { API } from "../config/Api";
 import { AppContext } from "../contexts/appContexts";
@@ -7,29 +7,31 @@ import { UserContext } from "../contexts/userContext";
 import editPhoto from "../assets/edit.png";
 import editIconGray from "../assets/editIconGray.png";
 import editIconRed from "../assets/editIconRed.png";
-import checkEditGray from "../assets/checkEditGray.png";
-import checkEditRed from "../assets/checkEditRed.png";
+import chekMarkIcon from "../assets/checkmark.png";
+import markAllIcon from "../assets/markAll.png";
+import markAllActiveIcon from "../assets/markAllActive.png";
 import barcodIcon from "../assets/barcod.png";
 import logo from "../assets/logo.png";
+import trashIcon from "../assets/trash.png";
 import Arrow from "../components/icon/arrow";
 import Spinner from "../components/feedback/spinner2";
+import X from "../components/icon/x";
 
 const Profile = () => {
   const contexts = useContext(AppContext);
   const [state] = useContext(UserContext);
-  const [trans, setTrans] = useState();
-  const [isEditPhoto, setIsEditPhoto] = useState(false);
-  const [isEditName, setIsEditName] = useState(false);
-  const [isEditEmail, setIsEditEmail] = useState(false);
-  const [isEditPhone, setIsEditPhone] = useState(false);
-  const [isEditPosCode, setIsEditPosCode] = useState(false);
-  const [isEditAddress, setIsEditAddress] = useState(false);
+  const [transactions, setTransactions] = useState();
+  const [isEdit, setIsEdit] = useState(false);
   const [preview, setPreview] = useState();
+  const [isEditForm, setIsEditForm] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [mark, setMark] = useState([]);
+  const [isMarkHistory, setIsMarkHistory] = useState(false);
+  const [isMarkAll, setIsMarkAll] = useState(false);
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
 
   const [profile, setProfile] = useState();
-  const [editData, setEditData] = useState({
+  let [editData, setEditData] = useState({
     name: "",
     email: "",
     image: "",
@@ -57,7 +59,7 @@ const Profile = () => {
   useEffect(() => {
     async function getDataTrans() {
       const result = await API.get("/transaction");
-      setTrans(result.data.data);
+      setTransactions(result.data.data);
     }
     getDataTrans();
 
@@ -92,6 +94,74 @@ const Profile = () => {
     }
   };
 
+  const fieldForm = [
+    {
+      id: 1,
+      title: "Name :",
+      type: "text",
+      name: "name",
+      value: editData.name,
+      info: profile?.name,
+    },
+    {
+      id: 2,
+      title: "Email :",
+      type: "email",
+      name: "email",
+      value: editData.email,
+      info: profile?.email,
+    },
+    {
+      id: 3,
+      title: "Phone :",
+      type: "text",
+      name: "phone",
+      value: editData.phone,
+      info: profile?.phone,
+    },
+    {
+      id: 4,
+      title: "Pos Code :",
+      type: "text",
+      name: "pos_code",
+      value: editData.pos_code,
+      info: profile?.pos_code,
+    },
+    {
+      id: 5,
+      title: "Address :",
+      type: "text",
+      name: "address",
+      value: editData.address,
+      info: profile?.address,
+    },
+  ];
+
+  const handlerEditForm = (id) => {
+    let filterID = isEditForm.filter((e) => e === id);
+    if (filterID[0] !== id) {
+      setIsEditForm([...isEditForm, id]);
+    } else {
+      setIsEditForm(isEditForm.filter((e) => e !== id));
+
+      if (id === 1) {
+        editData.name = profile?.name;
+      }
+      if (id === 2) {
+        editData.email = profile?.email;
+      }
+      if (id === 3) {
+        editData.phone = profile?.phone;
+      }
+      if (id === 4) {
+        editData.pos_code = profile?.pos_code;
+      }
+      if (id === 5) {
+        editData.address = profile?.address;
+      }
+    }
+  };
+
   const handleSubmit = useMutation(async (e) => {
     try {
       e.preventDefault();
@@ -113,14 +183,70 @@ const Profile = () => {
       const result = await API.get("/check-auth");
       setProfile(result.data.data);
 
+      setIsEdit(false);
+      setIsEditForm([]);
+      setEditData({
+        name: profile?.name,
+        email: profile?.email,
+        phone: profile?.phone,
+        pos_code: profile?.pos_code,
+        address: profile?.address,
+      });
       setIsLoading(false);
       contexts.refreshNavbar();
-      setIsEditPhoto(false);
-      setIsEditName(false);
-      setIsEditEmail(false);
-      setIsEditPhone(false);
-      setIsEditPosCode(false);
-      setIsEditAddress(false);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+  const scrollFunc = () => {
+    const section = document.querySelector(
+      `#scrollIntoView${transactions?.length - 1}`
+    );
+    section.scrollIntoView();
+  };
+  const scrollFunc2 = () => {
+    const section = document.querySelector(
+      `#scrollIntoView${transactions?.length - 1}`
+    );
+    setTimeout(() => {
+      section.scrollIntoView();
+    }, 0);
+  };
+
+  const handlerMark = (id) => {
+    let filterID = mark.filter((e) => e === id);
+    if (filterID[0] !== id) {
+      setMark([...mark, id]);
+    } else {
+      setMark(mark.filter((e) => e !== id));
+    }
+  };
+
+  const handlerMarkAll = () => {
+    const markedAll = transactions.map((trans) => trans.id);
+    setMark(markedAll);
+  };
+
+  const handlerDeleteHistory = useMutation(async (e) => {
+    try {
+      e.preventDefault();
+
+      setIsLoading(true);
+
+      const config = { headers: { "Content-type": "application/json" } };
+      const body = JSON.stringify({
+        id: mark,
+      });
+
+      await API.post(`/delete-transaction`, body, config);
+
+      const result = await API.get("/transaction");
+      setTransactions(result.data.data);
+
+      setIsLoading(false);
+      setMark([]);
+      setIsMarkHistory(false);
     } catch (error) {
       console.log(error);
     }
@@ -129,8 +255,32 @@ const Profile = () => {
   return (
     <div className="mt-20 lg:mt-32 py-4">
       <div className="lg:relative mx-auto max-w-6xl 2xl:max-w-7xl lg:px-10">
-        <div className="px-3 mb-3 lg:hidden">
+        <div className="px-3 mb-3 lg:hidden flex justify-between">
           <h2 className="text-3xl font-extrabold text-red-600">My Profile</h2>
+          {isEdit ? (
+            <button
+              className="w-[90px] rounded-md flex justify-center items-center bg-red-600 lg:hover:bg-red-500 text-white font-semibold mr-[2px]"
+              onClick={(e) => handleSubmit.mutate(e)}
+            >
+              {isLoading ? (
+                <div className="flex items-center h-6 w-6">
+                  <div className="w-full h-full">
+                    <Spinner fill="text-red-50" />
+                  </div>
+                </div>
+              ) : (
+                <span>Save</span>
+              )}
+            </button>
+          ) : (
+            <div
+              className="group cursor-pointer w-[32px] flex items-center"
+              onClick={() => setIsEdit(true)}
+            >
+              <img src={editIconGray} className="lg:group-hover:hidden" />
+              <img src={editIconRed} className="hidden lg:group-hover:block" />
+            </div>
+          )}
         </div>
         <div className="lg:flex justify-between lg:mb-4">
           <div className="px-3 lg:w-[50%]">
@@ -150,7 +300,7 @@ const Profile = () => {
                     <div className="aspect-[1/1] rounded-full overflow-hidden flex items-center border-8">
                       <img src={preview} className="w-full" />
                     </div>
-                    {isEditPhoto && (
+                    {isEdit && (
                       <>
                         <form>
                           <input
@@ -170,389 +320,92 @@ const Profile = () => {
                       </>
                     )}
                   </div>
-                  {isEditPhoto ? (
-                    <>
-                      {isLoading ? (
-                        <div className="h-[28px] w-[28px] lg:h-[24px] lg:w-[24px] absolute right-0 bottom-0 lg:-right-1 lg:-bottom-1">
-                          <div className="w-full h-full">
-                            <Spinner fill="text-neutral-400" />
-                          </div>
-                        </div>
-                      ) : (
-                        <div
-                          className="h-[28px] w-[28px] lg:h-[24px] lg:w-[24px] absolute right-0 md:right-6 bottom-0 lg:-right-1 xl:right-0 lg:bottom-0 cursor-pointer group"
-                          onClick={(e) => handleSubmit.mutate(e)}
-                        >
-                          <img
-                            src={checkEditGray}
-                            className="lg:group-hover:hidden"
-                          />
-                          <img
-                            src={checkEditRed}
-                            className="hidden lg:group-hover:block"
-                          />
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div
-                      className="h-[28px] w-[28px] lg:h-[24px] lg:w-[24px] absolute right-0 md:right-6 bottom-0 lg:-right-1 xl:right-0 lg:bottom-0 cursor-pointer group"
-                      onClick={() => setIsEditPhoto(true)}
-                    >
-                      <img
-                        src={editIconGray}
-                        className="lg:group-hover:hidden"
-                      />
-                      <img
-                        src={editIconRed}
-                        className="hidden lg:group-hover:block"
-                      />
-                    </div>
-                  )}
                 </div>
 
                 <div className="mt-4 md:mt-0 md:pl-20 lg:pl-8 lg:pr-6 md:flex items-center">
                   <div className="w-full">
-                    {/* START OF EDIT NAME */}
-                    <div>
-                      <h5 className="font-semibold text-lg leading-4 lg:text-md md:leading-5">
-                        Name :
-                      </h5>
-                      <div className="grid grid-cols-[auto,28px] lg:grid-cols-[auto,24px] mb-4">
-                        <div className="flex items-center w-full">
-                          {isEditName ? (
-                            <form className="w-full pr-3">
-                              <input
-                                type="text"
-                                name="name"
-                                autoFocus
-                                onFocus={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
-                                onBlur={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
-                                className="p-0 w-full border-0 focus:ring-0 underline text-slate-500"
-                                value={editData.name}
-                                onChange={handleChange}
-                              />
-                            </form>
+                    {fieldForm.map((item) => (
+                      <div key={item.id}>
+                        <h5 className="font-semibold text-lg leading-4 lg:text-md md:leading-5">
+                          {item.title}
+                        </h5>
+                        <div className="grid grid-cols-[auto,28px] lg:grid-cols-[auto,24px] mb-4">
+                          <div className="flex items-center w-full">
+                            {isEditForm.filter(
+                              (element) => element === item.id
+                            )[0] === item.id ? (
+                              <form className="w-full pr-3">
+                                <input
+                                  type={item.type}
+                                  name={item.name}
+                                  autoFocus
+                                  onFocus={() =>
+                                    setTimeout(() => {
+                                      setWindowHeight(window.innerHeight);
+                                    }, 300)
+                                  }
+                                  onBlur={() =>
+                                    setTimeout(() => {
+                                      setWindowHeight(window.innerHeight);
+                                    }, 300)
+                                  }
+                                  className="p-0 w-full leading-[1.2rem] mt-1 pb-[1px] border-0 focus:ring-0 text-slate-500"
+                                  value={item.value}
+                                  onChange={handleChange}
+                                />
+                              </form>
+                            ) : (
+                              <span className="block w-full mr-3 leading-[1.2rem] mt-1">
+                                {item.info !== "" ? item.info : "-"}
+                              </span>
+                            )}
+                          </div>
+                          {isEditForm.filter(
+                            (element) => element === item.id
+                          )[0] === item.id ? (
+                            <>
+                              {isEdit ? (
+                                <div
+                                  className="group cursor-pointer"
+                                  onClick={() => handlerEditForm(item.id)}
+                                >
+                                  <div className="lg:group-hover:hidden h-[28px] w-[21px] flex items-center justify-end">
+                                    <div className="scale-[160%]">
+                                      <X fill={"text-gray-400"} />
+                                    </div>
+                                  </div>
+                                  <div className="hidden lg:group-hover:block">
+                                    <X />
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="h-[28px]"></div>
+                              )}
+                            </>
                           ) : (
-                            <span className="block w-full pr-3">
-                              {profile?.name}
-                            </span>
+                            <>
+                              {isEdit ? (
+                                <div
+                                  className="group cursor-pointer"
+                                  onClick={() => handlerEditForm(item.id)}
+                                >
+                                  <img
+                                    src={editIconGray}
+                                    className="lg:group-hover:hidden"
+                                  />
+                                  <img
+                                    src={editIconRed}
+                                    className="hidden lg:group-hover:block"
+                                  />
+                                </div>
+                              ) : (
+                                <div className="h-[28px]"></div>
+                              )}
+                            </>
                           )}
                         </div>
-                        {isEditName ? (
-                          <>
-                            {isLoading ? (
-                              <div className="flex items-center">
-                                <div className="w-full h-full">
-                                  <Spinner fill="text-neutral-400" />
-                                </div>
-                              </div>
-                            ) : (
-                              <div
-                                className="flex items-center group cursor-pointer"
-                                onClick={(e) => handleSubmit.mutate(e)}
-                              >
-                                <img
-                                  src={checkEditGray}
-                                  className="lg:group-hover:hidden"
-                                />
-                                <img
-                                  src={checkEditRed}
-                                  className="hidden lg:group-hover:block"
-                                />
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <div
-                            className="flex items-center group cursor-pointer"
-                            onClick={() => setIsEditName(true)}
-                          >
-                            <img
-                              src={editIconGray}
-                              className="lg:group-hover:hidden"
-                            />
-                            <img
-                              src={editIconRed}
-                              className="hidden lg:group-hover:block"
-                            />
-                          </div>
-                        )}
                       </div>
-                    </div>
-                    {/* END OF EDIT NAME */}
-                    {/* START OF EDIT EMAIL */}
-                    <div>
-                      <h5 className="font-semibold text-lg leading-4 lg:text-md md:leading-5">
-                        Email :
-                      </h5>
-                      <div className="grid grid-cols-[auto,28px] lg:grid-cols-[auto,24px] mb-4">
-                        <div className="flex items-center w-full">
-                          {isEditEmail ? (
-                            <form className="w-full pr-3">
-                              <input
-                                type="email"
-                                name="email"
-                                autoFocus
-                                onFocus={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
-                                onBlur={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
-                                className="p-0 w-full border-0 focus:ring-0 underline text-slate-500"
-                                value={editData.email}
-                                onChange={handleChange}
-                              />
-                            </form>
-                          ) : (
-                            <span className="block w-full pr-3">
-                              {profile?.email}
-                            </span>
-                          )}
-                        </div>
-                        {isEditEmail ? (
-                          <>
-                            {isLoading ? (
-                              <div className="flex items-center">
-                                <div className="w-full h-full">
-                                  <Spinner fill="text-neutral-400" />
-                                </div>
-                              </div>
-                            ) : (
-                              <div
-                                className="flex items-center group cursor-pointer"
-                                onClick={(e) => handleSubmit.mutate(e)}
-                              >
-                                <img
-                                  src={checkEditGray}
-                                  className="lg:group-hover:hidden"
-                                />
-                                <img
-                                  src={checkEditRed}
-                                  className="hidden lg:group-hover:block"
-                                />
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <div
-                            className="flex items-center group cursor-pointer"
-                            onClick={() => setIsEditEmail(true)}
-                          >
-                            <img
-                              src={editIconGray}
-                              className="lg:group-hover:hidden"
-                            />
-                            <img
-                              src={editIconRed}
-                              className="hidden lg:group-hover:block"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    {/* END OF EDIT EMAIL */}
-                    {/* START OF EDIT PHONE */}
-                    <div>
-                      <h5 className="font-semibold text-lg leading-4 lg:text-md md:leading-5">
-                        Phone :
-                      </h5>
-                      <div className="grid grid-cols-[auto,28px] lg:grid-cols-[auto,24px] mb-4">
-                        <div className="flex items-center w-full">
-                          {isEditPhone ? (
-                            <form className="w-full pr-3">
-                              <input
-                                type="text"
-                                name="phone"
-                                autoFocus
-                                onFocus={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
-                                onBlur={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
-                                className="p-0 w-full border-0 focus:ring-0 underline text-slate-500"
-                                value={editData.phone}
-                                onChange={handleChange}
-                              />
-                            </form>
-                          ) : (
-                            <span className="block w-full pr-3">
-                              {profile?.phone !== "" ? profile?.phone : "-"}
-                            </span>
-                          )}
-                        </div>
-                        {isEditPhone ? (
-                          <>
-                            {isLoading ? (
-                              <div className="flex items-center">
-                                <div className="w-full h-full">
-                                  <Spinner fill="text-neutral-400" />
-                                </div>
-                              </div>
-                            ) : (
-                              <div
-                                className="flex items-center group cursor-pointer"
-                                onClick={(e) => handleSubmit.mutate(e)}
-                              >
-                                <img
-                                  src={checkEditGray}
-                                  className="lg:group-hover:hidden"
-                                />
-                                <img
-                                  src={checkEditRed}
-                                  className="hidden lg:group-hover:block"
-                                />
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <div
-                            className="flex items-center group cursor-pointer"
-                            onClick={() => setIsEditPhone(true)}
-                          >
-                            <img
-                              src={editIconGray}
-                              className="lg:group-hover:hidden"
-                            />
-                            <img
-                              src={editIconRed}
-                              className="hidden lg:group-hover:block"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    {/* END OF EDIT PHONE */}
-                    {/* START OF EDIT POS CODE */}
-                    <div>
-                      <h5 className="font-semibold text-lg leading-4 lg:text-md md:leading-5">
-                        Pos Code :
-                      </h5>
-                      <div className="grid grid-cols-[auto,28px] lg:grid-cols-[auto,24px] mb-4">
-                        <div className="flex items-center w-full">
-                          {isEditPosCode ? (
-                            <form className="w-full pr-3">
-                              <input
-                                type="text"
-                                name="pos_code"
-                                autoFocus
-                                onFocus={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
-                                onBlur={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
-                                className="p-0 w-full border-0 focus:ring-0 underline text-slate-500"
-                                value={editData.pos_code}
-                                onChange={handleChange}
-                              />
-                            </form>
-                          ) : (
-                            <span className="block w-full pr-3">
-                              {profile?.pos_code !== "" ? profile?.pos_code : "-"}
-                            </span>
-                          )}
-                        </div>
-                        {isEditPosCode ? (
-                          <>
-                            {isLoading ? (
-                              <div className="flex items-center">
-                                <div className="w-full h-full">
-                                  <Spinner fill="text-neutral-400" />
-                                </div>
-                              </div>
-                            ) : (
-                              <div
-                                className="flex items-center group cursor-pointer"
-                                onClick={(e) => handleSubmit.mutate(e)}
-                              >
-                                <img
-                                  src={checkEditGray}
-                                  className="lg:group-hover:hidden"
-                                />
-                                <img
-                                  src={checkEditRed}
-                                  className="hidden lg:group-hover:block"
-                                />
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <div
-                            className="flex items-center group cursor-pointer"
-                            onClick={() => setIsEditPosCode(true)}
-                          >
-                            <img
-                              src={editIconGray}
-                              className="lg:group-hover:hidden"
-                            />
-                            <img
-                              src={editIconRed}
-                              className="hidden lg:group-hover:block"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    {/* END OF EDIT POS CODE */}
-                    {/* START OF EDIT ADDRESS */}
-                    <div className="">
-                      <h5 className="font-semibold text-lg leading-4 lg:text-md md:leading-5">
-                        Address :
-                      </h5>
-                      <div className="grid grid-cols-[auto,28px] lg:grid-cols-[auto,24px] mb-4">
-                        <div className="flex items-center w-full">
-                          {isEditAddress ? (
-                            <form className="w-full pr-3">
-                              <input
-                                type="text"
-                                name="address"
-                                autoFocus
-                                onFocus={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
-                                onBlur={() => setTimeout(() => {setWindowHeight(window.innerHeight)}, 300)}
-                                className="p-0 w-full border-0 focus:ring-0 underline text-slate-500"
-                                value={editData.address}
-                                onChange={handleChange}
-                              />
-                            </form>
-                          ) : (
-                            <span className="block w-full pr-3 leading-[1.2rem] mt-1">
-                              {profile?.address !== "" ? profile?.address : "-"}
-                            </span>
-                          )}
-                        </div>
-                        {isEditAddress ? (
-                          <>
-                            {isLoading ? (
-                              <div className="flex items-center">
-                                <div className="w-full h-full">
-                                  <Spinner fill="text-neutral-400" />
-                                </div>
-                              </div>
-                            ) : (
-                              <div
-                                className="group cursor-pointer"
-                                onClick={(e) => handleSubmit.mutate(e)}
-                              >
-                                <img
-                                  src={checkEditGray}
-                                  className="lg:group-hover:hidden"
-                                />
-                                <img
-                                  src={checkEditRed}
-                                  className="hidden lg:group-hover:block"
-                                />
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <div
-                            className="group cursor-pointer"
-                            onClick={() => setIsEditAddress(true)}
-                          >
-                            <img
-                              src={editIconGray}
-                              className="lg:group-hover:hidden"
-                            />
-                            <img
-                              src={editIconRed}
-                              className="hidden lg:group-hover:block"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    {/* END OF EDIT ADDRESS */}
+                    ))}
                   </div>
                 </div>
               </div>
@@ -565,9 +418,72 @@ const Profile = () => {
           >
             {({ open }) => (
               <>
-                <div className="h-14 fixed inset-x-0 bottom-0 flex justify-between items-center pl-3 pr-1 lg:hidden border-t-2 bg-white">
+                <div className="h-14 fixed inset-x-0 bottom-0 flex justify-between items-center px-3 lg:hidden border-t-2 bg-white">
                   {open ? (
-                    <div></div>
+                    <>
+                      {isMarkHistory ? (
+                        <Menu as="div">
+                          <Menu.Button className="px-5 py-1 bg-red-600 rounded text-white font-semibold">
+                            Delete
+                          </Menu.Button>
+                          <Transition
+                            as={Fragment}
+                            enter="transition ease-out duration-100"
+                            enterFrom="transform opacity-0 scale-95"
+                            enterTo="transform opacity-100 scale-100"
+                            leave="transition ease-in duration-75"
+                            leaveFrom="transform opacity-100 scale-100"
+                            leaveTo="transform opacity-0 scale-95"
+                          >
+                            <Menu.Items className="fixed inset-0 z-[999] px-3 h-[100vh] flex items-center">
+                              <div className="w-full md:max-w-md rounded-lg bg-white shadow-xl mb-6 pb-6 px-4 mx-auto border-2 border-red-500">
+                                <h3 className="mt-6 text-center text-2xl font-bold tracking-tight text-red-600 mb-6">
+                                  Are you sure?
+                                </h3>
+                                <div className="flex justify-center gap-2">
+                                  <Menu.Button
+                                    className="bg-red-600 w-24 py-1 font-bold text-white rounded-md hover:bg-red-500"
+                                    onClick={() => {
+                                      setIsMarkHistory(false);
+                                      setMark([]);
+                                      setIsMarkAll(false);
+                                    }}
+                                  >
+                                    No
+                                  </Menu.Button>
+                                  {isLoading ? (
+                                    <button className="bg-slate-500 flex justify-center items-center w-24 py-1 font-bold text-white rounded-md hover:bg-slate-400">
+                                      <div className="w-5 h-5">
+                                        <Spinner fill="text-white" />
+                                      </div>
+                                    </button>
+                                  ) : (
+                                    <button
+                                      className="bg-slate-500 w-24 py-1 font-bold text-white rounded-md hover:bg-slate-400"
+                                      onClick={(e) =>
+                                        handlerDeleteHistory.mutate(e)
+                                      }
+                                    >
+                                      <span>Yes</span>
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            </Menu.Items>
+                          </Transition>
+                        </Menu>
+                      ) : (
+                        <div
+                          className="w-6"
+                          onClick={() => {
+                            setIsMarkHistory(true);
+                            scrollFunc2();
+                          }}
+                        >
+                          <img src={trashIcon} />
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <span className="text-slate-700 text-xl font-semibold">
                       My Transactions
@@ -575,13 +491,13 @@ const Profile = () => {
                   )}
                   {open ? (
                     <Disclosure.Button className="flex justify-center items-center pt-1">
-                      <div className="w-12 h-12 scale-110">
+                      <div className="w-[30px] h-[30px] scale-[180%]">
                         <Arrow fill="text-red-600" />
                       </div>
                     </Disclosure.Button>
                   ) : (
                     <Disclosure.Button className="flex justify-center items-center">
-                      <div className="w-12 h-12 scale-110 rotate-180">
+                      <div className="w-[30px] h-[30px] scale-[180%] rotate-180">
                         <Arrow fill="text-red-600" />
                       </div>
                     </Disclosure.Button>
@@ -590,103 +506,153 @@ const Profile = () => {
 
                 <Disclosure.Panel className="lg:hidden h-[100vh]">
                   <div className="">
-                    <div className="px-3 pt-24 pb-2 bg-white border-b-2">
+                    <div className="flex justify-between px-3 pt-24 pb-2 bg-white border-b-2">
                       <h2 className="text-3xl font-extrabold text-red-600 mb-2">
                         My Transactions
                       </h2>
-                    </div>
-                    <div className="flex flex-col-reverse px-3 h-[80vh] overflow-y-scroll pt-3 pb-24">
-                      {trans !== 0 && trans !== undefined && (
+                      {isMarkHistory && (
                         <>
-                          {trans?.map((trans) => (
+                          {isMarkAll ? (
                             <div
-                              key={trans.id}
-                              className="md:flex rounded-lg p-3 mb-3 bg-rose-100"
+                              className="w-8 pt-[2px] mr-[1px]"
+                              onClick={() => {
+                                setMark([]);
+                                setIsMarkAll(false);
+                              }}
                             >
-                              <div className="">
-                                {trans.carts.map((cart, index) => (
-                                  <div
-                                    key={index}
-                                    className="grid grid-cols-[90px,auto] mb-4"
-                                  >
-                                    <div className="aspect-[3/5] flex justify-center rounded overflow-hidden">
-                                      <img
-                                        src={cart.product.image}
-                                        className="h-full max-w-none"
-                                      />
-                                    </div>
-                                    <div className="ml-2 flex flex-col justify-between">
-                                      <div>
-                                        <div className="mb-2">
-                                          <h5 className="text-lg font-semibold text-red-700 leading-5 mb-1">
-                                            {cart.product.title}
-                                          </h5>
-                                          <h6 className="text-sm">
-                                            <span className=" text-red-800">
-                                              {cart.trans_day},{" "}
-                                            </span>
-                                            {cart.trans_time}
-                                          </h6>
+                              <img src={markAllActiveIcon} />
+                            </div>
+                          ) : (
+                            <div
+                              className="w-8 pt-[2px] mr-[1px]"
+                              onClick={() => {
+                                handlerMarkAll();
+                                setIsMarkAll(true);
+                              }}
+                            >
+                              <img src={markAllIcon} />
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                    <div className="flex flex-col-reverse px-3 h-[80vh] overflow-y-scroll pb-24">
+                      {transactions !== 0 && transactions !== undefined && (
+                        <>
+                          {transactions?.map((trans, index) => (
+                            <div
+                              {...(transactions?.length - 1 === index && {
+                                id: `scrollIntoView${index}`,
+                                onLoad: scrollFunc,
+                              })}
+                              key={trans.id}
+                              className="pt-3"
+                            >
+                              <div className="md:flex rounded-lg p-3 bg-rose-100">
+                                {isMarkHistory && (
+                                  <div className="h-[26px] flex justify-end mb-1">
+                                    <div onClick={() => handlerMark(trans.id)}>
+                                      {mark.filter(
+                                        (element) => element === trans.id
+                                      )[0] === trans.id ? (
+                                        <div className="bg-red-600 h-full w-[26px] p-[2px] rounded border-2 border-red-400">
+                                          <img src={chekMarkIcon} />
                                         </div>
-                                        <div className="grid grid-cols-[64px,auto] mb-1">
-                                          <div className="font-semibold text-sm flex justify-between leading-4">
-                                            <span className="block">
-                                              Topping
-                                            </span>
+                                      ) : (
+                                        <div className="bg-slate-300 h-full w-[26px] p-[2px] rounded border-2 border-red-400"></div>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                                <div className="">
+                                  {trans.carts.map((cart) => (
+                                    <div
+                                      key={cart.id}
+                                      className="grid grid-cols-[90px,auto] mb-4"
+                                    >
+                                      <div className="aspect-[3/5] flex justify-center rounded overflow-hidden">
+                                        <img
+                                          src={cart.product.image}
+                                          className="h-full max-w-none"
+                                        />
+                                      </div>
+                                      <div className="ml-2 flex flex-col justify-between">
+                                        <div>
+                                          <div className="mb-2">
+                                            <h5 className="text-lg font-semibold text-red-700 leading-5 mb-1">
+                                              {cart.product.title}
+                                            </h5>
+                                            <h6 className="text-sm">
+                                              <span className=" text-red-800">
+                                                {cart.trans_day},{" "}
+                                              </span>
+                                              {cart.trans_time}
+                                            </h6>
+                                          </div>
+                                          <div className="grid grid-cols-[64px,auto] mb-1">
+                                            <div className="font-semibold text-sm flex justify-between leading-4">
+                                              <span className="block">
+                                                Topping
+                                              </span>
+                                              <span className="block">:</span>
+                                            </div>
+                                            <div className="text-sm ml-2 leading-4 text-slate-700">
+                                              {cart.toppings.map(
+                                                (topping, index) => (
+                                                  <span key={topping.id}>
+                                                    {cart.toppings.length ===
+                                                    index + 1 ? (
+                                                      <>{topping.title}</>
+                                                    ) : (
+                                                      <>{topping.title}, </>
+                                                    )}
+                                                  </span>
+                                                )
+                                              )}
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div className="grid grid-cols-[64px,auto]">
+                                          <div className="font-semibold text-sm flex justify-between">
+                                            <span className="block">Price</span>
                                             <span className="block">:</span>
                                           </div>
-                                          <div className="text-sm ml-2 leading-4 text-slate-700">
-                                            {cart.toppings.map(
-                                              (topping, index) => (
-                                                <span key={topping.id}>
-                                                  {cart.toppings.length ===
-                                                  index + 1 ? (
-                                                    <>{topping.title}</>
-                                                  ) : (
-                                                    <>{topping.title}, </>
-                                                  )}
-                                                </span>
-                                              )
-                                            )}
+                                          <div className="text-sm ml-2">
+                                            <span className="block text-red-700">
+                                              {contexts.formatRupiah(
+                                                cart.price
+                                              )}
+                                            </span>
                                           </div>
                                         </div>
                                       </div>
-                                      <div className="grid grid-cols-[64px,auto]">
-                                        <div className="font-semibold text-sm flex justify-between">
-                                          <span className="block">Price</span>
-                                          <span className="block">:</span>
-                                        </div>
-                                        <div className="text-sm ml-2">
-                                          <span className="block text-red-700">
-                                            {contexts.formatRupiah(cart.price)}
-                                          </span>
-                                        </div>
+                                    </div>
+                                  ))}
+                                </div>
+                                <div className="mt-2 grid grid-cols-[60px,60px,auto] gap-2 border-t-[1px] border-slate-400 pt-3">
+                                  <div className="">
+                                    <img className="w-100" src={logo} />
+                                  </div>
+                                  <div className="">
+                                    <img className="w-100" src={barcodIcon} />
+                                  </div>
+                                  <div className="pl-2 flex flex-col justify-between h-full">
+                                    <div className="w-full text-center">
+                                      <button className="px-3 py-1 rounded bg-teal-400 text-teal-400 bg-opacity-20">
+                                        <span>{trans.status}</span>
+                                      </button>
+                                    </div>
+                                    <div className="grid grid-cols-[50px,auto] text-red-700">
+                                      <div className="flex justify-between leading-4 font-semibold">
+                                        <span>Total</span>
+                                        <span>:</span>
                                       </div>
+                                      <span className="leading-4 font-semibold text-end">
+                                        {contexts.formatRupiah(
+                                          trans.total_price
+                                        )}
+                                      </span>
                                     </div>
-                                  </div>
-                                ))}
-                              </div>
-                              <div className="mt-2 grid grid-cols-[60px,60px,auto] gap-2 border-t-[1px] border-slate-800 pt-3">
-                                <div className="">
-                                  <img className="w-100" src={logo} />
-                                </div>
-                                <div className="">
-                                  <img className="w-100" src={barcodIcon} />
-                                </div>
-                                <div className="pl-2 flex flex-col justify-between h-full">
-                                  <div className="w-full text-center">
-                                    <button className="px-3 py-1 rounded bg-teal-400 text-teal-400 bg-opacity-20">
-                                      <span>{trans.status}</span>
-                                    </button>
-                                  </div>
-                                  <div className="grid grid-cols-[50px,auto] text-red-700">
-                                    <div className="flex justify-between leading-4 font-semibold">
-                                      <span>Total</span>
-                                      <span>:</span>
-                                    </div>
-                                    <span className="leading-4 font-semibold text-end">
-                                      {contexts.formatRupiah(trans.total_price)}
-                                    </span>
                                   </div>
                                 </div>
                               </div>

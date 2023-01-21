@@ -82,7 +82,7 @@ export default function Navbars() {
                   {/* Profile dropdown */}
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <Menu.Button className="flex items-center h-11 w-11 lg:h-14 lg:w-14 overflow-hidden rounded-full text-sm border-rose-700 border-[2px]">
+                      <Menu.Button className="flex items-center h-[52px] w-[52px] lg:h-14 lg:w-14 overflow-hidden rounded-full text-sm border-[4px]">
                         <span className="sr-only">Open user menu</span>
                         <img
                           className="w-full"
@@ -100,7 +100,7 @@ export default function Navbars() {
                       leaveFrom="transform opacity-100 scale-100"
                       leaveTo="transform opacity-0 scale-95"
                     >
-                      <Menu.Items className="absolute right-0 top-14 mt-1 lg:mt-4 w-48 origin-top-right border-rose-600 border-opacity-50 border-[1px] rounded-md bg-white py-1 shadow-md">
+                      <Menu.Items className="absolute right-1 lg:right-[2px] top-[62px] mt-1 lg:mt-2 w-48 origin-top-right border-rose-600 border-opacity-50 border-[1px] rounded-md bg-white py-1 shadow-md">
                         <div className="bg-white border-rose-600 border-t-[1px] border-l-[1px] border-opacity-50 w-4 h-4 absolute rotate-45 top-[-8.8px] right-3 lg:right-[17px]"></div>
                         <Menu.Item>
                           <div className="pt-2 pb-2">

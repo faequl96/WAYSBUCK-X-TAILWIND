@@ -186,7 +186,7 @@ export const AppContextProvider = ({ children }) => {
 
   const refreshNavbar = async () => {
     try {
-      const response = await API.get(`/user/${state.user.id}`);
+      const response = await API.get(`/user`);
       let payload = response.data.data;
       setProfilePhoto(payload.image);
     } catch (error) {
