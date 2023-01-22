@@ -345,7 +345,7 @@ const Profile = () => {
                                 />
                               </form>
                             ) : (
-                              <span className="block w-full mr-3 leading-[1.2rem] mt-1">
+                              <span className="block w-full mr-3 leading-[1.2rem] mt-1 bg-red-500">
                                 {item.info !== "" ? item.info : "-"}
                               </span>
                             )}
