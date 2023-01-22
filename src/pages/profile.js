@@ -489,8 +489,8 @@ const Profile = () => {
                 </div>
 
                 <Disclosure.Panel className="lg:hidden h-[100vh]">
-                  <div className="">
-                    <div className="px-3 pt-24 pb-2 border-b-2 bg-white">
+                  <div className="pt-24">
+                    <div className="px-3 pb-2 border-b-2 bg-white">
                       <div className="flex justify-between items-center pb-2">
                         <h2 className="text-3xl font-extrabold text-red-600">
                           My Transactions
