@@ -339,7 +339,7 @@ const Profile = () => {
                                       setWindowHeight(window.innerHeight);
                                     }, 300)
                                   }
-                                  className="p-0 w-full leading-[1.2rem] mt-1 pb-[1px] border-0 focus:ring-0 text-slate-500"
+                                  className="p-0 w-full leading-[1.2rem] mt-1 border-0 focus:ring-0 text-slate-500 bg-amber-300"
                                   value={item.value}
                                   onChange={handleChange}
                                 />
@@ -437,11 +437,11 @@ const Profile = () => {
                 </div>
               </div>
               <div
-                className={`flex flex-col px-3 overflow-y-scroll pb-9 ${
-                  windowHeight < 600
+                className={`flex flex-col px-3 overflow-y-scroll pb-11 ${
+                  windowHeight < 640
                     ? windowHeight < 480
                       ? "h-[50vh]"
-                      : "h-[64vh]"
+                      : "h-[68vh]"
                     : "h-[74vh]"
                 }`}
               >
