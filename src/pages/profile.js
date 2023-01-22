@@ -490,35 +490,37 @@ const Profile = () => {
 
                 <Disclosure.Panel className="lg:hidden h-[100vh]">
                   <div className="">
-                    <div className="flex justify-between px-3 pt-24 pb-2 bg-white border-b-2">
-                      <h2 className="text-3xl font-extrabold text-red-600 mb-2">
-                        My Transactions
-                      </h2>
-                      {isMarkHistory && (
-                        <>
-                          {isMarkAll ? (
-                            <div
-                              className="w-8 pt-[2px] mr-[1px]"
-                              onClick={() => {
-                                setMark([]);
-                                setIsMarkAll(false);
-                              }}
-                            >
-                              <img src={markAllActiveIcon} />
-                            </div>
-                          ) : (
-                            <div
-                              className="w-8 pt-[2px] mr-[1px]"
-                              onClick={() => {
-                                handlerMarkAll();
-                                setIsMarkAll(true);
-                              }}
-                            >
-                              <img src={markAllIcon} />
-                            </div>
-                          )}
-                        </>
-                      )}
+                    <div className="px-3 pt-24 pb-2 border-b-2 bg-white">
+                      <div className="flex justify-between items-center pb-2">
+                        <h2 className="text-3xl font-extrabold text-red-600">
+                          My Transactions
+                        </h2>
+                        {isMarkHistory && (
+                          <>
+                            {isMarkAll ? (
+                              <div
+                                className="w-8 pt-[2px] mr-[1px]"
+                                onClick={() => {
+                                  setMark([]);
+                                  setIsMarkAll(false);
+                                }}
+                              >
+                                <img src={markAllActiveIcon} />
+                              </div>
+                            ) : (
+                              <div
+                                className="w-8 pt-[2px] mr-[1px]"
+                                onClick={() => {
+                                  handlerMarkAll();
+                                  setIsMarkAll(true);
+                                }}
+                              >
+                                <img src={markAllIcon} />
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
                     </div>
                     <div
                       className={`flex flex-col px-3 overflow-y-scroll pb-9 ${

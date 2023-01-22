@@ -253,8 +253,6 @@ const Cart = () => {
     };
   }, []);
 
-  console.log(windowHeight);
-
   return (
     <div className="mt-20 lg:mt-32 md:py-4" onLoad={() =>
       setTimeout(() => {
@@ -271,9 +269,9 @@ const Cart = () => {
           </h5>
         </div>
         <div className="lg:flex justify-between mt-44 md:mt-28 lg:mt-0 mb-8 lg:mb-4">
-          <div className="px-3 lg:w-[60%]">
+          <div className="lg:w-[60%]">
             <div
-              className={`lg:border-t-[1px] lg:border-b-[1px] border-slate-800 pt-1 pb-1 lg:mb-8 lg:pr-4 overflow-y-scroll lg:h-[40vh] ${
+              className={`lg:border-t-[1px] lg:border-b-[1px] border-slate-800 pt-1 px-3 pb-1 lg:mb-8 lg:pr-4 overflow-y-scroll lg:h-[40vh] ${
                 contexts.cartLength === 0 && "flex items-center"
               } ${
                 windowHeight < 640 ? (windowHeight < 540 ? "h-[36vh]" : "h-[48vh]") : "h-[56vh]"
