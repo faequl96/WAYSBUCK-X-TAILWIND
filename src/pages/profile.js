@@ -489,17 +489,17 @@ const Profile = () => {
                 </div>
 
                 <Disclosure.Panel className="lg:hidden h-[100vh]">
-                  <div className="">
+                  <div className="pt-44">
                     <div className="px-3 pb-2 border-b-2 bg-white">
                       <div className="flex justify-between items-center pb-2">
-                        <h2 className="text-3xl font-extrabold text-red-600 mt-24">
+                        <h2 className="text-3xl font-extrabold text-red-600">
                           My Transactions
                         </h2>
                         {isMarkHistory && (
                           <>
                             {isMarkAll ? (
                               <div
-                                className="w-8 pt-[2px] mr-[1px] mt-24"
+                                className="w-8 pt-[2px] mr-[1px]"
                                 onClick={() => {
                                   setMark([]);
                                   setIsMarkAll(false);
@@ -509,7 +509,7 @@ const Profile = () => {
                               </div>
                             ) : (
                               <div
-                                className="w-8 pt-[2px] mr-[1px] mt-24"
+                                className="w-8 pt-[2px] mr-[1px]"
                                 onClick={() => {
                                   handlerMarkAll();
                                   setIsMarkAll(true);
