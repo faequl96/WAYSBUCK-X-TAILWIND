@@ -442,7 +442,7 @@ const Profile = () => {
                     ? windowHeight < 480
                       ? "h-[50vh]"
                       : "h-[64vh]"
-                    : "h-[72vh]"
+                    : "h-[74vh]"
                 }`}
               >
                 {transactions !== 0 && transactions !== undefined && (
