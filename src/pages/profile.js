@@ -334,7 +334,7 @@ const Profile = () => {
                                       setWindowHeight(window.innerHeight);
                                     }, 300)
                                   }
-                                  className="p-0 w-full leading-[1.2rem] mt-[5px] border-0 focus:ring-0 text-slate-500"
+                                  className="p-0 w-full leading-[1.2rem] mt-[6px] border-0 focus:ring-0 text-slate-500"
                                   value={item.value}
                                   onChange={handleChange}
                                 />
