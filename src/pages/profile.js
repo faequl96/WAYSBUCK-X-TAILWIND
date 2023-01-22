@@ -276,15 +276,10 @@ const Profile = () => {
               </h2>
             </div>
             <div
-              className={`pt-1 overflow-y-scroll md:overflow-y-auto ${
-                windowHeight < 640
-                  ? windowHeight < 480
-                    ? "h-[50vh]"
-                    : "h-[68vh]"
-                  : "h-[74vh]"
-              }`}
+              className={`pt-1 overflow-y-scroll md:overflow-y-auto`}
+              style={{height: `${windowHeight-200}px`}}
             >
-              <div className="md:grid grid-cols-[280px,auto] lg:grid-cols-[160px,auto] xl:grid-cols-[200px,auto] mb-8">
+              <div className="md:grid grid-cols-[280px,auto] lg:grid-cols-[160px,auto] xl:grid-cols-[200px,auto] mb-4">
                 <div className="w-100 h-32 md:h-64 lg:h-40 xl:h-48 flex justify-center md:justify-start relative">
                   <div className="aspect-[1/1] h-full relative">
                     <div className="aspect-[1/1] rounded-full overflow-hidden flex items-center border-8">
@@ -339,13 +334,13 @@ const Profile = () => {
                                       setWindowHeight(window.innerHeight);
                                     }, 300)
                                   }
-                                  className="p-0 w-full leading-[1.2rem] mt-[5px] border-0 focus:ring-0 text-slate-500 bg-amber-300"
+                                  className="p-0 w-full leading-[1.2rem] mt-[5px] border-0 focus:ring-0 text-slate-500"
                                   value={item.value}
                                   onChange={handleChange}
                                 />
                               </form>
                             ) : (
-                              <span className="block w-full mr-3 leading-[1.2rem] mt-1 bg-red-500">
+                              <span className="block w-full mr-3 leading-[1.2rem] mt-1">
                                 {item.info !== "" ? item.info : "-"}
                               </span>
                             )}
@@ -437,16 +432,9 @@ const Profile = () => {
                 </div>
               </div>
               <div
-                className={`flex flex-col px-3 overflow-y-scroll pb-11 h-[${
-                  windowHeight-206}px]`}
+                className={`flex flex-col px-3 overflow-y-scroll pb-4`}
+                style={{height: `${windowHeight-206}px`}}
               >
-                {/* ${
-                  windowHeight < 640
-                    ? windowHeight < 480
-                      ? "h-[50vh]"
-                      : "h-[68vh]"
-                    : "h-[74vh]"
-                } */}
                 {transactions !== 0 && transactions !== undefined && (
                   <>
                     {transactions?.map((trans, index) => (
