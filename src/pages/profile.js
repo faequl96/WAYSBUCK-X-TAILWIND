@@ -438,10 +438,10 @@ const Profile = () => {
               </div>
               <div
                 className={`flex flex-col px-3 overflow-y-scroll pb-9 ${
-                  windowHeight < 640
+                  windowHeight < 600
                     ? windowHeight < 480
                       ? "h-[50vh]"
-                      : "h-[68vh]"
+                      : "h-[64vh]"
                     : "h-[72vh]"
                 }`}
               >
