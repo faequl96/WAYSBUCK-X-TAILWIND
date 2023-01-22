@@ -21,6 +21,8 @@ const Cart = () => {
   const [requiredPosCode, setRequiredPosCode] = useState(false);
   const [requiredAddress, setRequiredAddress] = useState(false);
 
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+
   let { data: cart, refetch } = useQuery("cartsCache", async () => {
     const response = await API.get("/cart");
 
@@ -251,8 +253,14 @@ const Cart = () => {
     };
   }, []);
 
+  console.log(windowHeight);
+
   return (
-    <div className="mt-20 lg:mt-32 md:py-4">
+    <div className="mt-20 lg:mt-32 md:py-4" onLoad={() =>
+      setTimeout(() => {
+        setWindowHeight(window.innerHeight);
+      }, 300)
+    }>
       <div className="lg:relative mx-auto max-w-6xl 2xl:max-w-7xl lg:px-10">
         <div className="px-3 mb-5 bg-white fixed lg:static left-0 right-0 top-0">
           <h2 className="text-3xl font-extrabold text-red-600 mb-2 mt-24 lg:mt-0">
@@ -262,14 +270,16 @@ const Cart = () => {
             Review Your Order
           </h5>
         </div>
-        <div className="lg:flex justify-between mt-52 md:mt-28 lg:mt-0 mb-44 lg:mb-4">
+        <div className="lg:flex justify-between mt-44 md:mt-28 lg:mt-0 mb-8 lg:mb-4">
           <div className="px-3 lg:w-[60%]">
             <div
-              className={`lg:border-t-[1px] lg:border-b-[1px] border-slate-800 mb-4 lg:mb-8 lg:pr-4 lg:overflow-y-scroll min-h-[50vh] lg:h-[40vh] ${
-                cart?.length == undefined ? "flex items-center" : ""
+              className={`lg:border-t-[1px] lg:border-b-[1px] border-slate-800 pt-1 pb-1 lg:mb-8 lg:pr-4 overflow-y-scroll lg:h-[40vh] ${
+                contexts.cartLength === 0 && "flex items-center"
+              } ${
+                windowHeight < 640 ? (windowHeight < 540 ? "h-[36vh]" : "h-[48vh]") : "h-[56vh]"
               }`}
             >
-              {cart?.length == undefined ? (
+              {contexts.cartLength === 0 ? (
                 <div className="h-[100%] lg:h-full w-full flex justify-center items-center">
                   <h3 className="font-bold text-xl text-slate-500">
                     Your cart is empty

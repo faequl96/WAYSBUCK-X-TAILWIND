@@ -199,21 +199,6 @@ const Profile = () => {
     }
   });
 
-  const scrollFunc = () => {
-    const section = document.querySelector(
-      `#scrollIntoView${transactions?.length - 1}`
-    );
-    section.scrollIntoView();
-  };
-  const scrollFunc2 = () => {
-    const section = document.querySelector(
-      `#scrollIntoView${transactions?.length - 1}`
-    );
-    setTimeout(() => {
-      section.scrollIntoView();
-    }, 0);
-  };
-
   const handlerMark = (id) => {
     let filterID = mark.filter((e) => e === id);
     if (filterID[0] !== id) {
@@ -294,7 +279,7 @@ const Profile = () => {
                 windowHeight < 600 ? "h-[56vh]" : "h-[70vh]"
               }`}
             >
-              <div className="md:grid grid-cols-[280px,auto] lg:grid-cols-[160px,auto] xl:grid-cols-[200px,auto] mb-4">
+              <div className="md:grid grid-cols-[280px,auto] lg:grid-cols-[160px,auto] xl:grid-cols-[200px,auto] mb-8">
                 <div className="w-100 h-32 md:h-64 lg:h-40 xl:h-48 flex justify-center md:justify-start relative">
                   <div className="aspect-[1/1] h-full relative">
                     <div className="aspect-[1/1] rounded-full overflow-hidden flex items-center border-8">
@@ -477,7 +462,6 @@ const Profile = () => {
                           className="w-6"
                           onClick={() => {
                             setIsMarkHistory(true);
-                            scrollFunc2();
                           }}
                         >
                           <img src={trashIcon} />
@@ -536,18 +520,15 @@ const Profile = () => {
                         </>
                       )}
                     </div>
-                    <div className="flex flex-col-reverse px-3 h-[80vh] overflow-y-scroll pb-24">
+                    <div
+                      className={`flex flex-col px-3 overflow-y-scroll pb-9 ${
+                        windowHeight < 600 ? "h-[56vh]" : "h-[70vh]"
+                      }`}
+                    >
                       {transactions !== 0 && transactions !== undefined && (
                         <>
                           {transactions?.map((trans, index) => (
-                            <div
-                              {...(transactions?.length - 1 === index && {
-                                id: `scrollIntoView${index}`,
-                                onLoad: scrollFunc,
-                              })}
-                              key={trans.id}
-                              className="pt-3"
-                            >
+                            <div key={trans.id} className="pt-3">
                               <div className="md:flex rounded-lg p-3 bg-rose-100">
                                 {isMarkHistory && (
                                   <div className="h-[26px] flex justify-end mb-1">
