@@ -177,7 +177,7 @@ const DetailProduct = () => {
             )}
           </div>
         </div>
-        <div className="lg:hidden">
+        <div className="hidden md:block lg:hidden">
           <h5 className="font-extrabold text-2xl text-red-700 mt-8">Topping</h5>
           <div className="mt-3 h-[30vh] border-t-[1px] border-b-[1px] border-slate-600 py-3 overflow-y-scroll grid grid-cols-3 gap-4">
             {toppings?.map((item) => (

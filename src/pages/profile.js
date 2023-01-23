@@ -604,7 +604,7 @@ const Profile = () => {
                               </div>
                             ))}
                           </div>
-                          <div className="border-l-[1px] border-red-400 pl-3">
+                          <div className="border-l-[1px] border-red-300 pl-3">
                             <div className="flex justify-center mb-1">
                               <div className="w-14">
                                 <img className="w-100" src={logo} />
@@ -761,7 +761,7 @@ const Profile = () => {
                                 </div>
                               ))}
                             </div>
-                            <div className="mt-2 md:mt-0 grid grid-cols-[60px,60px,auto] gap-2 md:block border-t-[1px] md:border-t-0 border-l-[1px] border-red-400 md:pl-3 pt-3 md:pt-0">
+                            <div className="mt-2 md:mt-0 grid grid-cols-[60px,60px,auto] gap-2 md:block border-t-[1px] md:border-t-0 md:border-l-[1px] border-red-300 md:pl-3 pt-3 md:pt-0">
                               <div className="md:flex justify-center md:mb-1">
                                 <div className="md:w-14">
                                   <img className="w-100" src={logo} />
