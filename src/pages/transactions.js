@@ -176,10 +176,21 @@ const Transactions = () => {
                         <Table.Cell>
                           {contexts.formatRupiah(tran?.total_price)}
                         </Table.Cell>
-                        <Table.Cell>{tran?.status}</Table.Cell>
+                        <Table.Cell>
+                          {tran.status === "Success" && (
+                            <button className="px-3 py-1 rounded bg-teal-400 text-teal-400 bg-opacity-20 w-full">
+                              <span>{tran.status}</span>
+                            </button>
+                          )}
+                          {tran.status === "Failed" && (
+                            <button className="px-3 py-1 rounded bg-red-500 text-red-500 bg-opacity-20 w-full">
+                              <span>{tran.status}</span>
+                            </button>
+                          )}
+                        </Table.Cell>
                         <Table.Cell>
                           <button
-                            className="cursor-pointer bg-red-600 hover:bg-red-500 py-2 px-4 text-white rounded"
+                            className="cursor-pointer bg-red-600 hover:bg-red-500 py-1 px-4 text-white rounded"
                             onClick={() => handlerDetail(tran.id)}
                           >
                             Show
@@ -282,9 +293,16 @@ const Transactions = () => {
                                   </div>
                                   <div className="pl-2 md:pl-0 flex flex-col justify-between md:block h-full">
                                     <div className="w-full text-center md:mb-2">
-                                      <button className="px-3 py-1 rounded bg-teal-400 text-teal-400 bg-opacity-20">
-                                        <span>{trans.status}</span>
-                                      </button>
+                                      {trans.status === "Success" && (
+                                        <button className="px-3 py-1 rounded bg-teal-400 text-teal-400 bg-opacity-20">
+                                          <span>{trans.status}</span>
+                                        </button>
+                                      )}
+                                      {trans.status === "Failed" && (
+                                        <button className="px-3 py-1 rounded bg-red-500 text-red-500 bg-opacity-20">
+                                          <span>{trans.status}</span>
+                                        </button>
+                                      )}
                                     </div>
                                     <div className="grid grid-cols-[50px,auto] text-red-700">
                                       <div className="flex justify-between leading-4 font-semibold">

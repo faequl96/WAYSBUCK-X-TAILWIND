@@ -617,9 +617,16 @@ const Profile = () => {
                             </div>
                             <div className="">
                               <div className="w-full text-center mb-2">
-                                <button className="px-3 py-1 rounded bg-teal-400 text-teal-400 bg-opacity-20">
-                                  <span>{trans.status}</span>
-                                </button>
+                                {trans.status === "Success" && (
+                                  <button className="px-3 py-1 rounded bg-teal-400 text-teal-400 bg-opacity-20">
+                                    <span>{trans.status}</span>
+                                  </button>
+                                )}
+                                {trans.status === "Failed" && (
+                                  <button className="px-3 py-1 rounded bg-red-500 text-red-500 bg-opacity-20">
+                                    <span>{trans.status}</span>
+                                  </button>
+                                )}
                               </div>
                               <div className="flex flex-col lg:items-center 2xl:grid 2xl:grid-cols-[50px,auto] text-red-700">
                                 <div className="xl:flex justify-between leading-4 font-semibold mb-1">
@@ -774,9 +781,16 @@ const Profile = () => {
                               </div>
                               <div className="pl-2 md:pl-0 flex flex-col justify-between md:block h-full">
                                 <div className="w-full text-center md:mb-2">
-                                  <button className="px-3 py-1 rounded bg-teal-400 text-teal-400 bg-opacity-20">
-                                    <span>{trans.status}</span>
-                                  </button>
+                                  {trans.status === "Success" && (
+                                    <button className="px-3 py-1 rounded bg-teal-400 text-teal-400 bg-opacity-20">
+                                      <span>{trans.status}</span>
+                                    </button>
+                                  )}
+                                  {trans.status === "Failed" && (
+                                    <button className="px-3 py-1 rounded bg-red-500 text-red-500 bg-opacity-20">
+                                      <span>{trans.status}</span>
+                                    </button>
+                                  )}
                                 </div>
                                 <div className="grid grid-cols-[50px,auto] text-red-700">
                                   <div className="flex justify-between leading-4 font-semibold">
