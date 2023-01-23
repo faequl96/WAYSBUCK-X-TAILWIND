@@ -70,8 +70,8 @@ const DetailProduct = () => {
 
   return (
     <div className="mt-20 lg:mt-32 md:py-4">
-      <div className="lg:relative mx-auto max-w-6xl 2xl:max-w-7xl lg:px-10">
-        <div className="px-3 mb-3 md:hidden">
+      <div className="px-3 lg:relative mx-auto max-w-6xl 2xl:max-w-7xl lg:px-10">
+        <div className="mb-3 md:hidden">
           <h2 className="font-extrabold text-3xl text-red-700 mb-2">
             {product?.title}
           </h2>
@@ -79,25 +79,25 @@ const DetailProduct = () => {
             {contexts.formatRupiah(product?.price)}
           </span>
         </div>
-        <div className="md:flex justify-between">
-          <div className="px-3 md:px-0 aspect-[1/1] md:aspect-[2/3] lg:aspect-[5/7] overflow-hidden md:w-[40%] lg:w-[44%] xl:w-[40%]">
-            <div className="flex justify-center md:h-full">
-              <img src={product?.image} className="md:max-w-none" />
+        <div className="md:grid grid-cols-[36%,auto]">
+          <div className="aspect-[1/1] lg:aspect-[5/7] max-w-[400px]">
+            <div className="h-full overflow-hidden lg:flex justify-center">
+              <img src={product?.image} className="lg:max-w-none lg:h-full" />
             </div>
           </div>
-          <div className="px-3 md:px-6 lg:pl-10 md:w-[60%] lg:w-[56%] xl:w-[60%]">
+          <div className="md:pl-6 lg:pl-10">
             <div className="hidden md:block">
-              <h2 className="font-extrabold text-3xl md:text-4xl text-red-700 mb-4">
+              <h2 className="font-extrabold text-3xl lg:text-4xl text-red-700 mb-4">
                 {product?.title}
               </h2>
               <span className="font-semibold text-xl lg:text-2xl text-red-900">
                 {contexts.formatRupiah(product?.price)}
               </span>
             </div>
-            <h5 className="font-extrabold text-2xl text-red-700 mt-4 md:mt-8">
+            <h5 className="font-extrabold text-2xl text-red-700 mt-4 md:mt-8 md:hidden">
               Topping
             </h5>
-            <div className="mt-5 md:mt-8 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 lg:px-0 mb-16 lg:mb-4">
+            <div className="md:hidden lg:grid py-3 mt-5 md:mt-8 lg:h-[240px] xl:h-[300px] 2xl:h-[320px] md:border-t-[1px] md:border-b-[1px] border-slate-600 overflow-y-scroll grid grid-cols-2 lg:grid-cols-4 gap-3 lg:px-0 mb-16 lg:mb-4">
               {toppings?.map((item) => (
                 <div key={item.id} className="flex mb-3 lg:block">
                   <div className="aspect-[1/1] w-[36%] lg:w-[38%] xl:w-[44%] mr-2 flex items-center lg:mx-auto relative">
@@ -134,6 +134,7 @@ const DetailProduct = () => {
                 </div>
               ))}
             </div>
+
             {state.user.role === "customer" && (
               <div className="fixed lg:static bottom-0 lg:bottom-auto left-0 lg:left-auto right-0 lg:right-auto h-14 lg:w-full bg-white bg-opacity-60 backdrop-blur border-t-2 lg:border-t-0">
                 <div className="h-14 px-3 lg:px-0">
@@ -174,6 +175,45 @@ const DetailProduct = () => {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+        <div className="lg:hidden">
+          <h5 className="font-extrabold text-2xl text-red-700 mt-8">Topping</h5>
+          <div className="mt-3 h-[30vh] border-t-[1px] border-b-[1px] border-slate-600 py-3 overflow-y-scroll grid grid-cols-3 gap-4">
+            {toppings?.map((item) => (
+              <div key={item.id} className="flex">
+                <div className="aspect-[1/1] w-[36%] mr-2 flex items-center relative">
+                  <img
+                    src={item.image}
+                    className="cursor-pointer"
+                    onClick={() => handlerCheckTopping(item.id, item.price)}
+                  />
+                  {toppingCheck.filter((element) => element === item.id)[0] ===
+                    item.id && (
+                    <div className="absolute right-0 bottom-0 lg:top-0 rounded-full">
+                      <img
+                        src={checkIcon}
+                        alt=""
+                        style={{ height: "25px", width: "25px" }}
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center w-[64%]">
+                  <div className="Z">
+                    <p
+                      className="text-red-700 text-[.96rem] font-semibold mt-1 mb-1 leading-[1.2rem] cursor-pointer"
+                      onClick={() => handlerCheckTopping(item.id, item.price)}
+                    >
+                      {item.title}
+                    </p>
+                    <p className="text-red-900">
+                      {contexts.formatRupiah(item.price)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

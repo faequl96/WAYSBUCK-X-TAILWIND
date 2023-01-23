@@ -270,14 +270,41 @@ const Profile = () => {
         </div>
         <div className="lg:flex justify-between lg:mb-4">
           <div className="px-3 lg:w-[50%]">
-            <div className="mb-8 hidden lg:block">
-              <h2 className="text-3xl font-extrabold text-red-600 mb-2">
+            <div className="mb-8 hidden lg:flex justify-between items-center pr-6">
+              <h2 className="text-3xl font-extrabold text-red-600">
                 My Profile
               </h2>
+              {isEdit ? (
+                <button
+                  className="w-[90px] h-10 rounded-md flex justify-center items-center bg-red-600 lg:hover:bg-red-500 text-white font-semibold mr-[2px]"
+                  onClick={(e) => handleSubmit.mutate(e)}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center h-6 w-6">
+                      <div className="w-full h-full">
+                        <Spinner fill="text-red-50" />
+                      </div>
+                    </div>
+                  ) : (
+                    <span>Save</span>
+                  )}
+                </button>
+              ) : (
+                <div
+                  className="group cursor-pointer w-[32px] flex items-center"
+                  onClick={() => setIsEdit(true)}
+                >
+                  <img src={editIconGray} className="lg:group-hover:hidden" />
+                  <img
+                    src={editIconRed}
+                    className="hidden lg:group-hover:block"
+                  />
+                </div>
+              )}
             </div>
             <div
-              className={`pt-1 overflow-y-scroll md:overflow-y-auto`}
-              style={{height: `${windowHeight-200}px`}}
+              className={`pt-1 overflow-y-scroll md:overflow-y-auto lg:h-[60vh]`}
+              style={{ height: `${windowHeight - 200}px` }}
             >
               <div className="md:grid grid-cols-[280px,auto] lg:grid-cols-[160px,auto] xl:grid-cols-[200px,auto] mb-4">
                 <div className="w-100 h-32 md:h-64 lg:h-40 xl:h-48 flex justify-center md:justify-start relative">
@@ -397,13 +424,13 @@ const Profile = () => {
             </div>
           </div>
 
-          {panelTransaction && (
-            <div className="lg:hidden h-[100vh] fixed inset-0 bg-white bg-opacity-60 backdrop-blur">
-              <div className="px-3 pb-2 border-b-2 bg-white pt-24">
-                <div className="flex justify-between items-center pb-2">
-                  <h2 className="text-3xl font-extrabold text-red-600">
-                    My Transactions
-                  </h2>
+          <div className="hidden lg:block w-[50%] bg-white pl-3">
+            <div className="pb-2 bg-white">
+              <div className="flex justify-between items-center pb-2">
+                <h2 className="text-3xl font-extrabold text-red-600">
+                  My Transactions
+                </h2>
+                <div className="flex items-center gap-2">
                   {isMarkHistory && (
                     <>
                       {isMarkAll ? (
@@ -429,32 +456,95 @@ const Profile = () => {
                       )}
                     </>
                   )}
+                  {isMarkHistory ? (
+                    <Menu as="div">
+                      <Menu.Button className="px-5 py-1 bg-red-600 rounded text-white font-semibold">
+                        Delete
+                      </Menu.Button>
+                      <Transition
+                        as={Fragment}
+                        enter="transition ease-out duration-100"
+                        enterFrom="transform opacity-0 scale-95"
+                        enterTo="transform opacity-100 scale-100"
+                        leave="transition ease-in duration-75"
+                        leaveFrom="transform opacity-100 scale-100"
+                        leaveTo="transform opacity-0 scale-95"
+                      >
+                        <Menu.Items className="fixed inset-0 z-[999] px-3 h-[100vh] flex items-center">
+                          <div className="w-full md:max-w-md rounded-lg bg-white shadow-xl mb-6 pb-6 px-4 mx-auto border-2 border-red-500">
+                            <h3 className="mt-6 text-center text-2xl font-bold tracking-tight text-red-600 mb-6">
+                              Are you sure?
+                            </h3>
+                            <div className="flex justify-center gap-2">
+                              <Menu.Button
+                                className="bg-red-600 w-24 py-1 font-bold text-white rounded-md hover:bg-red-500"
+                                onClick={() => {
+                                  setIsMarkHistory(false);
+                                  setMark([]);
+                                  setIsMarkAll(false);
+                                }}
+                              >
+                                No
+                              </Menu.Button>
+                              {isLoading ? (
+                                <button className="bg-slate-500 flex justify-center items-center w-24 py-1 font-bold text-white rounded-md hover:bg-slate-400">
+                                  <div className="w-5 h-5">
+                                    <Spinner fill="text-white" />
+                                  </div>
+                                </button>
+                              ) : (
+                                <button
+                                  className="bg-slate-500 w-24 py-1 font-bold text-white rounded-md hover:bg-slate-400"
+                                  onClick={(e) =>
+                                    handlerDeleteHistory.mutate(e)
+                                  }
+                                >
+                                  <span>Yes</span>
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </Menu.Items>
+                      </Transition>
+                    </Menu>
+                  ) : (
+                    <div
+                      className="w-6 cursor-pointer"
+                      onClick={() => {
+                        setIsMarkHistory(true);
+                      }}
+                    >
+                      <img src={trashIcon} />
+                    </div>
+                  )}
                 </div>
               </div>
-              <div
-                className={`flex flex-col px-3 overflow-y-scroll pb-4`}
-                style={{height: `${windowHeight-206}px`}}
-              >
-                {transactions !== 0 && transactions !== undefined && (
-                  <>
-                    {transactions?.map((trans, index) => (
-                      <div key={trans.id} className="pt-3">
-                        <div className="md:flex rounded-lg p-3 bg-rose-100">
-                          {isMarkHistory && (
-                            <div className="h-[26px] flex justify-end mb-1">
-                              <div onClick={() => handlerMark(trans.id)}>
-                                {mark.filter(
-                                  (element) => element === trans.id
-                                )[0] === trans.id ? (
-                                  <div className="bg-red-600 h-full w-[26px] p-[2px] rounded border-2 border-red-400">
-                                    <img src={chekMarkIcon} />
-                                  </div>
-                                ) : (
-                                  <div className="bg-slate-300 h-full w-[26px] p-[2px] rounded border-2 border-red-400"></div>
-                                )}
-                              </div>
+            </div>
+            <div
+              className={`flex flex-col pr-3 overflow-y-scroll overflow-x-hidden pb-4 border-y-[1px] h-[56vh] border-slate-600`}
+              style={{ height: `${windowHeight - 206}px` }}
+            >
+              {transactions !== 0 && transactions !== undefined && (
+                <>
+                  {transactions?.map((trans, index) => (
+                    <div key={trans.id} className="pt-3">
+                      <div className="rounded-lg p-3 bg-rose-100">
+                        {isMarkHistory && (
+                          <div className="h-[26px] flex justify-end mb-1">
+                            <div onClick={() => handlerMark(trans.id)}>
+                              {mark.filter(
+                                (element) => element === trans.id
+                              )[0] === trans.id ? (
+                                <div className="bg-red-600 h-full w-[26px] p-[2px] rounded border-2 border-red-400">
+                                  <img src={chekMarkIcon} />
+                                </div>
+                              ) : (
+                                <div className="bg-slate-300 h-full w-[26px] p-[2px] rounded border-2 border-red-400"></div>
+                              )}
                             </div>
-                          )}
+                          </div>
+                        )}
+                        <div className="grid grid-cols-[auto,120px] 2xl:grid-cols-[auto,160px]">
                           <div className="">
                             {trans.carts.map((cart) => (
                               <div
@@ -467,7 +557,7 @@ const Profile = () => {
                                     className="h-full max-w-none"
                                   />
                                 </div>
-                                <div className="ml-2 flex flex-col justify-between">
+                                <div className="ml-2 flex flex-col justify-between pr-3">
                                   <div>
                                     <div className="mb-2">
                                       <h5 className="text-lg font-semibold text-red-700 leading-5 mb-1">
@@ -514,27 +604,189 @@ const Profile = () => {
                               </div>
                             ))}
                           </div>
-                          <div className="mt-2 grid grid-cols-[60px,60px,auto] gap-2 border-t-[1px] border-slate-400 pt-3">
-                            <div className="">
-                              <img className="w-100" src={logo} />
+                          <div className="border-l-[1px] border-red-400 pl-3">
+                            <div className="flex justify-center mb-1">
+                              <div className="w-14">
+                                <img className="w-100" src={logo} />
+                              </div>
+                            </div>
+                            <div className="flex justify-center mb-2">
+                              <div className="w-16">
+                                <img className="w-100" src={barcodIcon} />
+                              </div>
                             </div>
                             <div className="">
-                              <img className="w-100" src={barcodIcon} />
-                            </div>
-                            <div className="pl-2 flex flex-col justify-between h-full">
-                              <div className="w-full text-center">
+                              <div className="w-full text-center mb-2">
                                 <button className="px-3 py-1 rounded bg-teal-400 text-teal-400 bg-opacity-20">
                                   <span>{trans.status}</span>
                                 </button>
                               </div>
-                              <div className="grid grid-cols-[50px,auto] text-red-700">
-                                <div className="flex justify-between leading-4 font-semibold">
-                                  <span>Total</span>
+                              <div className="flex flex-col lg:items-center 2xl:grid 2xl:grid-cols-[50px,auto] text-red-700">
+                                <div className="xl:flex justify-between leading-4 font-semibold mb-1">
+                                  <span>Total </span>
                                   <span>:</span>
                                 </div>
                                 <span className="leading-4 font-semibold text-end">
                                   {contexts.formatRupiah(trans.total_price)}
                                 </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          </div>
+
+          {panelTransaction && (
+            <div className="lg:hidden h-[100vh] fixed inset-0 bg-white bg-opacity-60 backdrop-blur">
+              <div className="px-3 pb-2 border-b-2 bg-white pt-24">
+                <div className="flex justify-between items-center pb-2">
+                  <h2 className="text-3xl font-extrabold text-red-600">
+                    My Transactions
+                  </h2>
+                  {isMarkHistory && (
+                    <>
+                      {isMarkAll ? (
+                        <div
+                          className="w-8 pt-[2px] mr-[1px]"
+                          onClick={() => {
+                            setMark([]);
+                            setIsMarkAll(false);
+                          }}
+                        >
+                          <img src={markAllActiveIcon} />
+                        </div>
+                      ) : (
+                        <div
+                          className="w-8 pt-[2px] mr-[1px]"
+                          onClick={() => {
+                            handlerMarkAll();
+                            setIsMarkAll(true);
+                          }}
+                        >
+                          <img src={markAllIcon} />
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+              <div
+                className={`flex flex-col px-3 overflow-y-scroll pb-4`}
+                style={{ height: `${windowHeight - 206}px` }}
+              >
+                {transactions !== 0 && transactions !== undefined && (
+                  <>
+                    {transactions?.map((trans) => (
+                      <div key={trans.id} className="pt-3">
+                        <div className="rounded-lg p-3 bg-rose-100">
+                          {isMarkHistory && (
+                            <div className="h-[26px] flex justify-end mb-1">
+                              <div onClick={() => handlerMark(trans.id)}>
+                                {mark.filter(
+                                  (element) => element === trans.id
+                                )[0] === trans.id ? (
+                                  <div className="bg-red-600 h-full w-[26px] p-[2px] rounded border-2 border-red-400">
+                                    <img src={chekMarkIcon} />
+                                  </div>
+                                ) : (
+                                  <div className="bg-slate-300 h-full w-[26px] p-[2px] rounded border-2 border-red-400"></div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                          <div className="md:grid grid-cols-[auto,170px]">
+                            <div className="">
+                              {trans.carts.map((cart) => (
+                                <div
+                                  key={cart.id}
+                                  className="grid grid-cols-[90px,auto] mb-4"
+                                >
+                                  <div className="aspect-[3/5] flex justify-center rounded overflow-hidden">
+                                    <img
+                                      src={cart.product.image}
+                                      className="h-full max-w-none"
+                                    />
+                                  </div>
+                                  <div className="ml-2 flex flex-col justify-between">
+                                    <div>
+                                      <div className="mb-2">
+                                        <h5 className="text-lg font-semibold text-red-700 leading-5 mb-1">
+                                          {cart.product.title}
+                                        </h5>
+                                        <h6 className="text-sm">
+                                          <span className=" text-red-800">
+                                            {cart.trans_day},{" "}
+                                          </span>
+                                          {cart.trans_time}
+                                        </h6>
+                                      </div>
+                                      <div className="grid grid-cols-[64px,auto] mb-1">
+                                        <div className="font-semibold text-sm flex justify-between leading-4">
+                                          <span className="block">Topping</span>
+                                          <span className="block">:</span>
+                                        </div>
+                                        <div className="text-sm ml-2 leading-4 text-slate-700">
+                                          {cart.toppings.map(
+                                            (topping, index) => (
+                                              <span key={topping.id}>
+                                                {cart.toppings.length ===
+                                                index + 1 ? (
+                                                  <>{topping.title}</>
+                                                ) : (
+                                                  <>{topping.title}, </>
+                                                )}
+                                              </span>
+                                            )
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="grid grid-cols-[64px,auto]">
+                                      <div className="font-semibold text-sm flex justify-between">
+                                        <span className="block">Price</span>
+                                        <span className="block">:</span>
+                                      </div>
+                                      <div className="text-sm ml-2">
+                                        <span className="block text-red-700">
+                                          {contexts.formatRupiah(cart.price)}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="mt-2 md:mt-0 grid grid-cols-[60px,60px,auto] gap-2 md:block border-t-[1px] md:border-t-0 border-l-[1px] border-red-400 md:pl-3 pt-3 md:pt-0">
+                              <div className="md:flex justify-center md:mb-1">
+                                <div className="md:w-14">
+                                  <img className="w-100" src={logo} />
+                                </div>
+                              </div>
+                              <div className="md:flex justify-center md:mb-2">
+                                <div className="md:w-16">
+                                  <img className="w-100" src={barcodIcon} />
+                                </div>
+                              </div>
+                              <div className="pl-2 md:pl-0 flex flex-col justify-between md:block h-full">
+                                <div className="w-full text-center md:mb-2">
+                                  <button className="px-3 py-1 rounded bg-teal-400 text-teal-400 bg-opacity-20">
+                                    <span>{trans.status}</span>
+                                  </button>
+                                </div>
+                                <div className="grid grid-cols-[50px,auto] text-red-700">
+                                  <div className="flex justify-between leading-4 font-semibold">
+                                    <span>Total</span>
+                                    <span>:</span>
+                                  </div>
+                                  <span className="leading-4 font-semibold text-end">
+                                    {contexts.formatRupiah(trans.total_price)}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           </div>

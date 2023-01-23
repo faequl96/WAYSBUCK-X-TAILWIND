@@ -37,7 +37,7 @@ const Products = () => {
                 Let's Order
               </h1>
             </div>
-            <div className="mt-4 md:mt-8 grid grid-cols-1 gap-3 md:gap-8 md:px-16 lg:px-0 md:grid-cols-2 lg:grid-cols-4 mb-12 px-3">
+            <div className="mt-4 md:mt-8 grid grid-cols-1 gap-4 md:gap-6 lg:px-0 md:grid-cols-3 lg:grid-cols-4 mb-12 px-3">
               {products?.map((item) => (
                 <div
                   key={item.id}

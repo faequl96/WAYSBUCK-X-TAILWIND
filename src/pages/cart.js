@@ -21,7 +21,7 @@ const Cart = () => {
   const [requiredPosCode, setRequiredPosCode] = useState(false);
   const [requiredAddress, setRequiredAddress] = useState(false);
 
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+  const windowHeight = window.innerHeight;
 
   let { data: cart, refetch } = useQuery("cartsCache", async () => {
     const response = await API.get("/cart");
@@ -264,13 +264,13 @@ const Cart = () => {
             Review Your Order
           </h5>
         </div>
-        <div className="lg:flex justify-between mt-44 md:mt-28 lg:mt-0 mb-8 lg:mb-4">
-          <div className="lg:w-[60%] pt-2">
+        <div className="lg:flex justify-between mt-44 md:mt-20 lg:mt-0 mb-8 lg:mb-4">
+          <div className="lg:w-[60%] pt-2 lg:px-3">
             <div
-              className={`lg:border-t-[1px] lg:border-b-[1px] border-slate-800 px-3 pb-1 lg:mb-8 lg:pr-4 overflow-y-scroll lg:h-[40vh] ${
+              className={`lg:border-t-[1px] lg:border-b-[1px] border-slate-800 px-3 lg:px-0 pb-1 lg:mb-8 lg:pr-4 overflow-y-scroll lg:h-[40vh] ${
                 contexts.cartLength === 0 && "flex items-center"
               }`}
-              style={{height: `${windowHeight-328}px`}}
+              style={{ height: `${windowHeight - 328}px` }}
             >
               {contexts.cartLength === 0 ? (
                 <div className="h-[100%] lg:h-full w-full flex justify-center items-center">
@@ -400,7 +400,7 @@ const Cart = () => {
                                     No
                                   </Menu.Button>
                                   <button
-                                    className="bg-slate-500 w-24 py-1 font-bold text-white rounded-md hover:bg-slate-400"
+                                    className="flex justify-center items-center bg-slate-500 w-24 py-1 font-bold text-white rounded-md hover:bg-slate-400"
                                     onClick={() => handlerDeleteCart(item.id)}
                                   >
                                     {isLoading ? (
@@ -423,15 +423,7 @@ const Cart = () => {
               )}
             </div>
             <div className="border-t-[1px] border-b-[1px] border-slate-800 py-3 hidden lg:block">
-              <div className="flex justify-between mb-3">
-                <span className="text-red-600 font-semibold">Subtotal</span>
-                <span className="text-red-600 font-semibold">
-                  {contexts.cartLength === 0
-                    ? contexts.formatRupiah(0)
-                    : contexts.formatRupiah(totalPrice)}
-                </span>
-              </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between mb-2">
                 <span className="text-red-600 font-semibold">Qty</span>
                 {contexts.cartLength === 0 ? (
                   <span className="text-red-600 font-semibold">-</span>
@@ -441,11 +433,11 @@ const Cart = () => {
                   </span>
                 )}
               </div>
-            </div>
-            <div className="py-3 hidden lg:block">
-              <div className="flex justify-between mb-3">
-                <span className="text-red-900 text-lg font-black">Total</span>
-                <span className="text-red-900 text-lg font-black">
+              <div className="flex justify-between">
+                <span className="text-red-600 text-lg font-extrabold">
+                  Total
+                </span>
+                <span className="text-red-600 text-lg font-extrabold">
                   {contexts.cartLength === 0
                     ? contexts.formatRupiah(0)
                     : contexts.formatRupiah(totalPrice)}
@@ -707,59 +699,162 @@ const Cart = () => {
                 </Disclosure.Panel>
 
                 <div className="hidden lg:block space-y-1 px-3 pl-10">
-                  <form>
-                    <div className="mb-6">
-                      <input
-                        name="recepient_name"
-                        type="text"
-                        required
-                        className="block w-full rounded-md border-[2px] border-red-600 px-3 py-3 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
-                        placeholder="Recepient Name"
-                        value={shippingForSomeOneElse.recepient_name}
-                        onChange={OnChangeFormTrans}
+                  <div className="grid grid-cols-[auto,60px] mb-8">
+                    <div>
+                      <h6 className="font-semibold text-md text-red-600">
+                        Shipping For Someone Else
+                      </h6>
+                    </div>
+                    <div className="text-end">
+                      <Toggle
+                        enabled={enabled}
+                        setEnabled={setEnabled}
+                        bgEnabled={"bg-red-600"}
+                        bgDisabled={"bg-slate-500"}
                       />
                     </div>
-                    <div className="mb-6">
-                      <input
-                        name="phone"
-                        type="text"
-                        required
-                        className="block w-full rounded-md border-[2px] border-red-600 px-3 py-3 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
-                        placeholder="Phone"
-                        value={shippingForSomeOneElse.phone}
-                        onChange={OnChangeFormTrans}
-                      />
-                    </div>
-                    <div className="mb-6">
-                      <input
-                        name="pos_code"
-                        type="text"
-                        required
-                        className="block w-full rounded-md border-[2px] border-red-600 px-3 py-3 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
-                        placeholder="Pos Code"
-                        value={shippingForSomeOneElse.pos_code}
-                        onChange={OnChangeFormTrans}
-                      />
-                    </div>
-                    <div className="mb-6">
-                      <input
-                        name="address"
-                        type="text"
-                        required
-                        className="block w-full rounded-md border-[2px] border-red-600 px-3 py-3 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
-                        placeholder="Address"
-                        value={shippingForSomeOneElse.address}
-                        onChange={OnChangeFormTrans}
-                      />
-                    </div>
-                  </form>
+                  </div>
+                  {enabled && (
+                    <form>
+                      <div className="mb-5 relative">
+                        <input
+                          name="recepient_name"
+                          type="text"
+                          required
+                          className="block w-full rounded-md border-[2px] border-red-600 px-3 py-3 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
+                          placeholder="Recepient Name"
+                          value={shippingForSomeOneElse.recepient_name}
+                          onChange={OnChangeFormTrans}
+                          onClick={() => setRequiredRecepient(false)}
+                        />
+                        {requiredRecepient && (
+                            <div className="absolute right-0 top-[10px] px-3 text-red-500">
+                              *Required
+                            </div>
+                          )}
+                      </div>
+                      <div className="mb-5 relative">
+                        <input
+                          name="phone"
+                          type="text"
+                          required
+                          className="block w-full rounded-md border-[2px] border-red-600 px-3 py-3 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
+                          placeholder="Phone"
+                          value={shippingForSomeOneElse.phone}
+                          onChange={OnChangeFormTrans}
+                          onClick={() => setRequiredPhone(false)}
+                        />
+                        {requiredPhone && (
+                            <div className="absolute right-0 top-[10px] px-3 text-red-500">
+                              *Required
+                            </div>
+                          )}
+                      </div>
+                      <div className="mb-5 relative">
+                        <input
+                          name="pos_code"
+                          type="text"
+                          required
+                          className="block w-full rounded-md border-[2px] border-red-600 px-3 py-3 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
+                          placeholder="Pos Code"
+                          value={shippingForSomeOneElse.pos_code}
+                          onChange={OnChangeFormTrans}
+                          onClick={() => setRequiredPosCode(false)}
+                        />
+                        {requiredPosCode && (
+                            <div className="absolute right-0 top-[10px] px-3 text-red-500">
+                              *Required
+                            </div>
+                          )}
+                      </div>
+                      <div className="mb-5 relative">
+                        <input
+                          name="address"
+                          type="text"
+                          required
+                          className="block w-full rounded-md border-[2px] border-red-600 px-3 py-3 text-gray-900 placeholder-gray-500 focus:border-gray-400 focus:outline-none focus:ring-0"
+                          placeholder="Address"
+                          value={shippingForSomeOneElse.address}
+                          onChange={OnChangeFormTrans}
+                          onClick={() => setRequiredAddress(false)}
+                        />
+                        {requiredAddress && (
+                            <div className="absolute right-0 top-[10px] px-3 text-red-500">
+                              *Required
+                            </div>
+                          )}
+                      </div>
+                    </form>
+                  )}
                   <div className="h-14 flex justify-end items-center">
-                    <button
-                      className="py-2 w-32 lg:text-xl lg:w-full rounded-md border-[2px] border-red-600 bg-red-600 hover:bg-red-500 font-bold text-white focus:outline-none"
-                      onClick={(e) => handlerTransaction.mutate(e)}
-                    >
-                      Pay
-                    </button>
+                    {cart?.length === 0 ? (
+                      <button className="py-2 w-32 lg:text-xl lg:w-full rounded-md bg-slate-500 cursor-default font-bold text-white focus:outline-none">
+                        Pay
+                      </button>
+                    ) : (
+                      <>
+                        {enabled ? (
+                          <button
+                            className="py-2 w-32 lg:text-xl lg:w-full rounded-md bg-red-600 hover:bg-red-500 font-bold text-white focus:outline-none"
+                            onClick={(e) => handlerTransaction.mutate(e)}
+                          >
+                            Pay
+                          </button>
+                        ) : (
+                          <>
+                            {profile?.phone === "" ||
+                            profile?.pos_code === "" ||
+                            profile?.address === "" ? (
+                              <>
+                                <Menu as="div">
+                                  <Menu.Button className="py-2 w-32 lg:text-xl lg:w-full rounded-md bg-red-600 hover:bg-red-500 font-bold text-white focus:outline-none">
+                                    Pay
+                                  </Menu.Button>
+                                  <Transition
+                                    as={Fragment}
+                                    enter="transition ease-out duration-100"
+                                    enterFrom="transform opacity-0"
+                                    enterTo="transform opacity-100 scale-100"
+                                    leave="transition ease-in duration-75"
+                                    leaveFrom="transform opacity-100 scale-100"
+                                    leaveTo="transform opacity-0"
+                                  >
+                                    <Menu.Items className="fixed -top-[88vh] -bottom-[10vh] inset-x-0 h-[120vh] z-[999] flex items-center px-3">
+                                      <div className="w-full md:max-w-md rounded-lg bg-white shadow-xl mb-6 pb-6 px-4 mx-auto border-2 border-red-500">
+                                        <h3 className="mt-6 text-center text-xl font-semibold tracking-tight text-slate-700 mb-6">
+                                          Your profile is not completed! Do you
+                                          want to complete it?
+                                        </h3>
+                                        <div className="flex justify-center gap-2">
+                                          <Menu.Button className="bg-red-600 w-24 py-1 font-bold text-white rounded-md hover:bg-red-500">
+                                            No
+                                          </Menu.Button>
+                                          <button
+                                            className="flex justify-center items-center bg-slate-500 w-24 py-1 font-bold text-white rounded-md hover:bg-slate-400"
+                                            onClick={() =>
+                                              navigate("/customer/profile")
+                                            }
+                                          >
+                                            Yes
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </Menu.Items>
+                                  </Transition>
+                                </Menu>
+                              </>
+                            ) : (
+                              <button
+                                className="py-2 w-32 lg:text-xl lg:w-full rounded-md bg-red-600 hover:bg-red-500 font-bold text-white focus:outline-none"
+                                onClick={(e) => handlerTransaction.mutate(e)}
+                              >
+                                Pay
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
               </>
