@@ -526,7 +526,7 @@ const Profile = () => {
             >
               {transactions !== 0 && transactions !== undefined && (
                 <>
-                  {transactions?.map((trans, index) => (
+                  {transactions?.map((trans) => (
                     <div key={trans.id} className="pt-3">
                       <div className="rounded-lg p-3 bg-rose-100">
                         {isMarkHistory && (

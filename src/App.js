@@ -10,6 +10,7 @@ import Cart from "./pages/cart";
 import DetailProduct from "./pages/detailProduct";
 import LandingPage from "./pages/landingPage";
 import Profile from "./pages/profile";
+import Transactions from "./pages/transactions";
 
 function App() {
   const contexts = useContext(AppContext);
@@ -44,11 +45,11 @@ function App() {
         ></Route>
         <Route exact path="/mycart" element={<Cart />}></Route>
         <Route exact path="/customer/profile" element={<Profile />}></Route>
-        {/* <Route
+        <Route
           exact
           path="/admin/transaction"
           element={<Transactions />}
-        ></Route> */}
+        ></Route>
         <Route exact path="/add-product" element={<AddProduct />}></Route>
         <Route exact path="/add-topping" element={<AddTopping />}></Route>
       </Routes>
